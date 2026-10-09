@@ -1,68 +1,94 @@
-# GoHighLevel Journey Studio — Client Demo
+# Groundwork — GoHighLevel Lead Capture, Nurture & Conversion System
 
-A high-fidelity GoHighLevel (GHL) system demonstration and proposal showcase designed for service businesses. It proves lead capture, qualification, appointment booking, follow-up automations, deduplication, TCPA compliance, and Retell AI voice agent integration.
-
-## 🚀 Live Demo & Surfaces
-
-The application consists of two connected surfaces:
-
-1. **Side A: Public Funnel (Alder & Finch Home Studio)**
-   - `/` — Branded landing page with cinematic hero, process, recent work, testimonials, and FAQ.
-   - `/start` — 5-step intake survey with live validation, duplicate detection, and recoverable error handling (`test@error.com`).
-   - `/book` — Real-time calendar slot picker with taken-slot collision handling (`2:30 PM`).
-   - `/thanks` — Booking confirmation with client-generated RFC-5545 `.ics` file download.
-   - `/booking/:id` — Self-serve reschedule and cancellation modal.
-
-2. **Side B: Operator Console (Journey Studio)**
-   - `/studio` — Overview dashboard with needs-action cards, speed-to-lead KPIs, and pre-flight audit findings.
-   - `/studio/pipeline` — 6-stage kanban with drag-and-drop, automated stage rules, and opportunity drawer.
-   - `/studio/contacts` — Contact database with tag filters, TCPA DND records, and CSV export.
-   - `/studio/workflows` — 5 named automations with interactive SVG node maps and stop-on-reply conditions.
-   - `/studio/simulator` — **Hero Feature**: trigger lead actions (Reply, STOP, Book, Duplicate, Miss) and watch robot messages cancel and staff tasks create in real time.
-   - `/studio/voice` — Retell AI + Twilio call feed, live simulated AI call with transcript, and GHL custom field mapping.
-   - `/studio/calendar` — Weekly calendar grid and availability settings that synchronize directly with `/book`.
-   - `/studio/reports` — Dynamic headline rewrite, 4 SVG analytics charts, and attribution table.
-   - `/studio/setup` — Custom fields dictionary, tag library taxonomy, and DNS checklist (SPF, DKIM, DMARC, A2P 10DLC).
-   - `/studio/handoff` — 12-point QA test runner, in-app operator guide, video walkthrough chapters, and 30-day support tickets.
-   - `/proposal` — $1,000 fixed price milestone roadmap with itemized voice agent line item.
+> **A turnkey, high-fidelity operating prototype built for US Home Builders (Alder & Stone Homes, Charlotte NC).**  
+> Built on GoHighLevel architecture with strict US telephony compliance, 90-day buyer nurture automation, social lead bots, and a 60-minute handover training academy.
 
 ---
 
-## 🛠️ Tech Stack
+## 🌟 Key Features & Interactive Demos
 
-- **Framework**: React 18 + TypeScript + Vite
-- **Styling**: Tailwind CSS + CSS Variables (Warm Editorial Design Tokens: Fraunces & Inter)
-- **State & Sync**: Zustand with LocalStorage persistence and `BroadcastChannel` for cross-tab updates
-- **Icons**: Lucide React
-- **Deployment**: Netlify ready (`netlify.toml` + `public/_redirects`)
+1. **Speed-to-Lead Simulator (<7s):**
+   - Live millisecond countdown benchmark clock.
+   - 6-step instant response sequence: lead ingestion, 2-way SMS, PDF lookbook email, counselor mobile push, and call bridge.
+   - Interactive speed switcher (0.5x, 1x, 2x) and email fallback error mode.
+
+2. **90-Day Buyer Nurture with Time Scrubber:**
+   - Visual flowchart canvas displaying triggers, delay waits, SMS, email, and staff tasks.
+   - Interactive time scrubber slider (Day 0 to Day 90) with auto-play mode (120ms/day) that lights up executed nodes and populates the buyer's received touch timeline.
+
+3. **Social Comment-to-Lead Automation:**
+   - Interactive Instagram feed mockup.
+   - Commenting `"PRICE"` triggers an instant public reply, private DM lookbook link, and creates an ingested lead in the CRM tagged with `Source: Instagram Organic`.
+
+4. **Sales Pipeline & Kanban Board:**
+   - 7 active buyer stages (*New Inquiry*, *Contacted*, *Tour Booked*, *Tour Completed*, *Design Consult*, *Contract Signed*, *Closed Won*) plus *Nurture* and *Lost* lanes.
+   - Drag-and-drop card movements triggering automated workflow toasts.
+   - 480px slide-out Lead Detail Drawer with *"Simulate Next Step"* action.
+
+5. **Marketing Attribution & Funnel Analytics:**
+   - Visual 5-stage conversion funnel with dropoff rates.
+   - Full channel attribution table computing **Cost Per Lead** and **Cost Per Contract** across Meta, Google, Portals, and Realtors.
+   - Dynamic date range filter (*Last 7d*, *Last 30d*, *Last 90d*, *This Quarter*).
+
+6. **US Telephony & Housing Compliance:**
+   - A2P 10DLC brand trust status verification.
+   - Automated TCPA Quiet-Hours Send Guard (intercepts messages attempted outside 8:00 AM – 9:00 PM local time).
+   - Interactive Fair Housing copy scanner that audits prohibited demographic terminology.
+
+7. **Team Academy Handover Player:**
+   - 16:9 video player UI with 8 structured chapters equaling 60:00 runtime.
+   - Interactive progress ring persisted to browser storage, transcripts, and downloadable SOP checklists.
+
+8. **Three Conversion Funnels:**
+   - Harlow Creek Master-Planned Community Inquiry Funnel (with live split-view to CRM).
+   - 5-Step Floor Plan Matcher Interactive Quiz.
+   - Custom & On-Your-Lot Discovery Portal.
 
 ---
 
-## 📦 Local Development
+## 🚀 Netlify Deployment
+
+This repository is pre-configured for instant zero-configuration deployment on **Netlify**:
+
+- **Build command:** `npm run build`
+- **Publish directory:** `dist`
+- **SPA Routing:** Configured via `netlify.toml` and `public/_redirects` to handle client-side routing (`/* -> /index.html 200`) on page refresh.
+
+### To Deploy on Netlify:
+1. Log in to [Netlify](https://app.netlify.com/).
+2. Click **"Add new site"** → **"Import an existing project"**.
+3. Select **GitHub** and authorize access to `arcthaneaidelta/GroundWork-Go-High-Level-Automation`.
+4. Netlify will automatically detect:
+   - Base directory: `/`
+   - Build command: `npm run build`
+   - Publish directory: `dist`
+5. Click **"Deploy site"**.
+
+---
+
+## 💻 Local Development
 
 ```bash
-# 1. Clone the repository
-git clone https://github.com/arcthaneaidelta/Gohighlevel-CRM.git
-cd Gohighlevel-CRM
+# Clone the repository
+git clone https://github.com/arcthaneaidelta/GroundWork-Go-High-Level-Automation.git
 
-# 2. Install dependencies
+# Install dependencies
 npm install
 
-# 3. Start development server
+# Start local development server
 npm run dev
 
-# 4. Build for production
+# Run production build
 npm run build
 ```
 
 ---
 
-## 🌐 Deploying to Netlify
+## 🛠 Technology Stack
 
-This repository is pre-configured with `netlify.toml` and `public/_redirects` for single-page application (SPA) routing:
-
-1. Connect this GitHub repository in Netlify.
-2. Build settings will auto-detect from `netlify.toml`:
-   - **Build command**: `npm run build`
-   - **Publish directory**: `dist`
-3. Click **Deploy Site**.
+- **Framework:** React 18 + TypeScript + Vite
+- **Styling:** Tailwind CSS v4 with bespoke residential architecture design tokens
+- **Typography:** Newsreader (display serif) & Instrument Sans (UI)
+- **Icons:** Lucide React
+- **Routing:** React Router v7
+- **State Management:** Reactive store with `sessionStorage` and `localStorage` persistence

@@ -5,7 +5,7 @@ export interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   title?: string;
-  description?: string;
+  subtitle?: string;
   children: React.ReactNode;
   maxWidth?: 'sm' | 'md' | 'lg' | 'xl';
 }
@@ -14,7 +14,7 @@ export const Modal: React.FC<ModalProps> = ({
   isOpen,
   onClose,
   title,
-  description,
+  subtitle,
   children,
   maxWidth = 'md',
 }) => {
@@ -36,46 +36,50 @@ export const Modal: React.FC<ModalProps> = ({
 
   if (!isOpen) return null;
 
-  const maxWidthClasses = {
-    sm: 'max-w-sm',
+  const maxWidthStyles = {
+    sm: 'max-w-md',
     md: 'max-w-lg',
     lg: 'max-w-2xl',
     xl: 'max-w-4xl',
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div
+      role="dialog"
+      aria-modal="true"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto"
+    >
       {/* Backdrop */}
-      <div 
-        className="fixed inset-0 bg-[#1F2420]/45 transition-opacity" 
-        onClick={onClose} 
+      <div
+        className="fixed inset-0 bg-[#1F2A27]/45 transition-opacity"
+        onClick={onClose}
       />
 
       {/* Dialog container */}
-      <div 
-        role="dialog"
-        aria-modal="true"
-        className={`relative z-10 w-full ${maxWidthClasses[maxWidth]} bg-surface-elevated rounded-modal shadow-sh-3 border border-border overflow-hidden transition-all transform animate-in fade-in-0 zoom-in-95 duration-base`}
+      <div
+        className={`relative w-full ${maxWidthStyles[maxWidth]} bg-[#FBF9F4] rounded-[16px] border border-[#C5BCA9] shadow-[0_16px_40px_rgba(31,42,39,0.14)] z-10 overflow-hidden my-auto`}
       >
-        {(title || description) && (
-          <div className="px-6 py-5 border-b border-border flex items-start justify-between bg-surface">
+        {(title || subtitle) && (
+          <div className="flex items-start justify-between p-6 border-b border-[#DDD6C8] bg-[#F6F3EC]">
             <div>
-              {title && <h3 className="text-base font-semibold text-text">{title}</h3>}
-              {description && <p className="text-xs text-text-muted mt-0.5">{description}</p>}
+              {title && (
+                <h3 className="font-serif text-xl text-[#1F2A27] font-medium leading-snug">
+                  {title}
+                </h3>
+              )}
+              {subtitle && <p className="text-xs text-[#79827D] mt-1">{subtitle}</p>}
             </div>
             <button
               onClick={onClose}
-              className="p-1 rounded-md text-text-muted hover:text-text hover:bg-sunken transition-colors"
-              aria-label="Close"
+              className="p-1 text-[#79827D] hover:text-[#1F2A27] rounded-md transition-colors"
+              aria-label="Close modal"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
         )}
 
-        <div className="p-6 max-h-[80vh] overflow-y-auto">
-          {children}
-        </div>
+        <div className="p-6">{children}</div>
       </div>
     </div>
   );

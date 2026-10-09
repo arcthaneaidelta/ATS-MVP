@@ -1,49 +1,57 @@
-import React, { useEffect } from 'react';
-import { useAppStore } from '../../store';
+import React from 'react';
+import { useDemoStore } from '../../store/demoStore';
 import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
 
 export const ToastContainer: React.FC = () => {
-  const { toasts, removeToast } = useAppStore();
-
-  useEffect(() => {
-    if (toasts.length === 0) return;
-    const timer = setTimeout(() => {
-      removeToast(toasts[toasts.length - 1].id);
-    }, 5000);
-    return () => clearTimeout(timer);
-  }, [toasts, removeToast]);
+  const { toasts, removeToast } = useDemoStore();
 
   if (toasts.length === 0) return null;
 
   return (
-    <div 
-      role="status" 
-      aria-live="polite" 
-      className="fixed bottom-5 right-5 z-[60] flex flex-col gap-2.5 max-w-sm w-full pointer-events-none"
+    <div
+      aria-live="polite"
+      className="fixed bottom-4 right-4 z-[70] flex flex-col gap-2.5 max-w-sm w-full pointer-events-none"
     >
       {toasts.map((toast) => {
-        const icon = toast.type === 'error' ? (
-          <AlertCircle className="w-5 h-5 text-error shrink-0" />
-        ) : toast.type === 'info' ? (
-          <Info className="w-5 h-5 text-info shrink-0" />
-        ) : (
-          <CheckCircle2 className="w-5 h-5 text-success shrink-0" />
-        );
+        const isSuccess = toast.type === 'success';
+        const isError = toast.type === 'error';
+        const isWarning = toast.type === 'warning';
+
+        const bgBorder = isSuccess
+          ? 'bg-[#E3EEE4] border-[#C2DEC5] text-[#1F2A27]'
+          : isError
+          ? 'bg-[#F3DEDA] border-[#E4B8B0] text-[#1F2A27]'
+          : isWarning
+          ? 'bg-[#F5EBD0] border-[#E8D4A2] text-[#1F2A27]'
+          : 'bg-[#FBF9F4] border-[#DDD6C8] text-[#1F2A27]';
+
+        const iconColor = isSuccess
+          ? 'text-[#4C7A57]'
+          : isError
+          ? 'text-[#A5473B]'
+          : isWarning
+          ? 'text-[#B98A2E]'
+          : 'text-[#4B6A82]';
 
         return (
           <div
             key={toast.id}
-            className="pointer-events-auto bg-surface-elevated border border-border rounded-card p-3.5 shadow-sh-2 flex items-start gap-3 transition-all duration-fast transform translate-y-0"
+            className={`pointer-events-auto flex items-start gap-3 p-4 rounded-[12px] border shadow-[0_4px_12px_rgba(31,42,39,0.08)] transition-all animate-in slide-in-from-bottom-2 duration-200 ${bgBorder}`}
           >
-            {icon}
+            <div className={`mt-0.5 shrink-0 ${iconColor}`}>
+              {isSuccess && <CheckCircle2 className="w-4 h-4" />}
+              {isError && <AlertCircle className="w-4 h-4" />}
+              {isWarning && <AlertCircle className="w-4 h-4" />}
+              {!isSuccess && !isError && !isWarning && <Info className="w-4 h-4" />}
+            </div>
             <div className="flex-1 min-w-0">
-              <h4 className="text-xs font-semibold text-text leading-tight">{toast.title}</h4>
-              <p className="text-xs text-text-2 mt-0.5 leading-snug">{toast.message}</p>
+              <h4 className="text-xs font-semibold">{toast.title}</h4>
+              <p className="text-xs text-[#4A5550] mt-0.5 leading-relaxed">{toast.description}</p>
             </div>
             <button
               onClick={() => removeToast(toast.id)}
-              className="text-text-muted hover:text-text p-1 -mr-1 -mt-1 rounded hover:bg-sunken transition-colors"
-              aria-label="Dismiss toast"
+              className="text-[#79827D] hover:text-[#1F2A27] p-0.5 rounded transition-colors"
+              aria-label="Dismiss notification"
             >
               <X className="w-3.5 h-3.5" />
             </button>

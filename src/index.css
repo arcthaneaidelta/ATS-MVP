@@ -1,1 +1,132 @@
-@import './styles/base.css';
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #F6F3EC;
+  --color-surface: #FBF9F4;
+  --color-elevated: #FFFFFF;
+  --color-sand: #EDE8DD;
+  --color-pine: #2F4A3F;
+  --color-pine-hover: #243A31;
+  --color-pine-active: #1B2D26;
+  --color-ink: #1F2A27;
+  --color-graphite: #4A5550;
+  --color-stone: #79827D;
+  --color-clay: #B4684A;
+  --color-clay-tint: #F0DFD5;
+  --color-hairline: #DDD6C8;
+  --color-hairline-strong: #C5BCA9;
+  --color-moss: #4C7A57;
+  --color-moss-tint: #E3EEE4;
+  --color-ochre: #B98A2E;
+  --color-ochre-tint: #F5EBD0;
+  --color-brick: #A5473B;
+  --color-brick-tint: #F3DEDA;
+  --color-slate-blue: #4B6A82;
+  --color-slate-blue-tint: #E1EAF0;
+
+  --font-display: 'Newsreader', Georgia, serif;
+  --font-sans: 'Instrument Sans', system-ui, -apple-system, sans-serif;
+  --font-ui: 'Instrument Sans', system-ui, -apple-system, sans-serif;
+
+  --shadow-1: 0 1px 2px rgba(31, 42, 39, 0.06);
+  --shadow-2: 0 4px 12px rgba(31, 42, 39, 0.08);
+  --shadow-3: 0 16px 40px rgba(31, 42, 39, 0.14);
+}
+
+:root {
+  --bg: #F6F3EC;
+  --surface: #FBF9F4;
+  --elevated: #FFFFFF;
+  --sand: #EDE8DD;
+  --pine: #2F4A3F;
+  --pine-hover: #243A31;
+  --pine-active: #1B2D26;
+  --ink: #1F2A27;
+  --graphite: #4A5550;
+  --stone: #79827D;
+  --clay: #B4684A;
+  --clay-tint: #F0DFD5;
+  --border: #DDD6C8;
+  --border-strong: #C5BCA9;
+  --success: #4C7A57;
+  --success-bg: #E3EEE4;
+  --warning: #B98A2E;
+  --warning-bg: #F5EBD0;
+  --error: #A5473B;
+  --error-bg: #F3DEDA;
+  --info: #4B6A82;
+  --info-bg: #E1EAF0;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-ui), 'Instrument Sans', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom architectural hairline helper */
+.hairline-border {
+  border: 1px solid var(--border);
+}
+
+.hairline-b {
+  border-bottom: 1px solid var(--border);
+}
+
+.hairline-t {
+  border-top: 1px solid var(--border);
+}
+
+.hairline-r {
+  border-right: 1px solid var(--border);
+}
+
+.hairline-l {
+  border-left: 1px solid var(--border);
+}
+
+/* Tabular figures for numbers */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Custom scrollbar matching paper/sand aesthetic */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #F6F3EC;
+}
+::-webkit-scrollbar-thumb {
+  background: #DDD6C8;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #C5BCA9;
+}
+
+/* Site plan subtle drifting animation */
+@keyframes sitePlanDrift {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-15px, -10px) scale(1.02);
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+.animate-site-plan {
+  animation: sitePlanDrift 60s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-site-plan {
+    animation: none;
+  }
+}
