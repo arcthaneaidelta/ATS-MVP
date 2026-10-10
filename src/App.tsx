@@ -1,82 +1,198 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { DemoStoreProvider } from './store/demoStore';
+import React, { lazy, Suspense } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { LandingPage } from './routes/landing/LandingPage';
+import { AppShell } from './components/layout/AppShell';
 
-// Layouts
-import { MarketingLayout } from './layouts/MarketingLayout';
-import { AppLayout } from './layouts/AppLayout';
+// Lazy-loaded App Route Chunks (PRD Section 16 Performance Architecture)
+const DashboardPage = lazy(() =>
+  import('./features/dashboard/DashboardPage').then((m) => ({ default: m.DashboardPage }))
+);
+const PartsPage = lazy(() =>
+  import('./features/parts/PartsPage').then((m) => ({ default: m.PartsPage }))
+);
+const PricingPage = lazy(() =>
+  import('./features/pricing/PricingPage').then((m) => ({ default: m.PricingPage }))
+);
+const RfqListPage = lazy(() =>
+  import('./features/rfq/RfqListPage').then((m) => ({ default: m.RfqListPage }))
+);
+const RfqImportWizardPage = lazy(() =>
+  import('./features/rfq/RfqImportWizardPage').then((m) => ({ default: m.RfqImportWizardPage }))
+);
+const QuotationBuilderPage = lazy(() =>
+  import('./features/rfq/QuotationBuilderPage').then((m) => ({ default: m.QuotationBuilderPage }))
+);
+const OrdersPage = lazy(() =>
+  import('./features/orders/OrdersPage').then((m) => ({ default: m.OrdersPage }))
+);
+const DocumentsPage = lazy(() =>
+  import('./features/documents/DocumentsPage').then((m) => ({ default: m.DocumentsPage }))
+);
+const FinancePage = lazy(() =>
+  import('./features/finance/FinancePage').then((m) => ({ default: m.FinancePage }))
+);
+const MigrationPage = lazy(() =>
+  import('./features/migration/MigrationPage').then((m) => ({ default: m.MigrationPage }))
+);
+const AdminPage = lazy(() =>
+  import('./features/admin/AdminPage').then((m) => ({ default: m.AdminPage }))
+);
+const ReportsPage = lazy(() =>
+  import('./features/reports/ReportsPage').then((m) => ({ default: m.ReportsPage }))
+);
+const NotFoundPage = lazy(() =>
+  import('./routes/NotFoundPage').then((m) => ({ default: m.NotFoundPage }))
+);
 
-// Marketing Pages
-import { HomePage } from './pages/marketing/HomePage';
-import { SystemPage } from './pages/marketing/SystemPage';
-import { FunnelsPage } from './pages/marketing/FunnelsPage';
-import { AcademyPage } from './pages/marketing/AcademyPage';
-import { CompliancePage } from './pages/marketing/CompliancePage';
-import { StartPage } from './pages/marketing/StartPage';
-
-// Standalone Funnel Pages
-import { CommunityFunnelStandalonePage } from './pages/funnels/CommunityFunnelStandalonePage';
-import { PlanQuizStandalonePage } from './pages/funnels/PlanQuizStandalonePage';
-import { CustomBuildStandalonePage } from './pages/funnels/CustomBuildStandalonePage';
-
-// Live App Pages
-import { CommandCenterPage } from './pages/app/CommandCenterPage';
-import { SpeedToLeadPage } from './pages/app/SpeedToLeadPage';
-import { PipelinePage } from './pages/app/PipelinePage';
-import { LeadsPage } from './pages/app/LeadsPage';
-import { ConversationsPage } from './pages/app/ConversationsPage';
-import { WorkflowsPage } from './pages/app/WorkflowsPage';
-import { CampaignsPage } from './pages/app/CampaignsPage';
-import { SocialPage } from './pages/app/SocialPage';
-import { CalendarPage } from './pages/app/CalendarPage';
-import { ReputationPage } from './pages/app/ReputationPage';
-import { ReportsPage } from './pages/app/ReportsPage';
-import { SettingsPage } from './pages/app/SettingsPage';
-
-// 404 Page
-import { NotFoundPage } from './pages/NotFoundPage';
+function RouteSuspenseFallback() {
+  return (
+    <div className="p-8 space-y-4 animate-pulse">
+      <div className="h-8 w-64 bg-surface-sunken rounded-sm" />
+      <div className="h-32 w-full bg-surface-sunken rounded-md" />
+      <div className="grid grid-cols-4 gap-4">
+        <div className="h-24 bg-surface-sunken rounded-sm" />
+        <div className="h-24 bg-surface-sunken rounded-sm" />
+        <div className="h-24 bg-surface-sunken rounded-sm" />
+        <div className="h-24 bg-surface-sunken rounded-sm" />
+      </div>
+    </div>
+  );
+}
 
 export function App() {
   return (
-    <DemoStoreProvider>
-      <BrowserRouter>
-        <Routes>
-          {/* Public Proposal & Marketing Site */}
-          <Route element={<MarketingLayout />}>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/system" element={<SystemPage />} />
-            <Route path="/funnels" element={<FunnelsPage />} />
-            <Route path="/academy" element={<AcademyPage />} />
-            <Route path="/compliance" element={<CompliancePage />} />
-            <Route path="/start" element={<StartPage />} />
-          </Route>
+    <BrowserRouter>
+      <Routes>
+        {/* Landing Page */}
+        <Route path="/" element={<LandingPage />} />
 
-          {/* Standalone Funnel Fullscreen Views */}
-          <Route path="/funnels/community" element={<CommunityFunnelStandalonePage />} />
-          <Route path="/funnels/plan-quiz" element={<PlanQuizStandalonePage />} />
-          <Route path="/funnels/custom-build" element={<CustomBuildStandalonePage />} />
+        {/* Application Shell & Lazy Feature Routes */}
+        <Route path="/app" element={<AppShell />}>
+          <Route
+            index
+            element={
+              <Suspense fallback={<RouteSuspenseFallback />}>
+                <DashboardPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="parts"
+            element={
+              <Suspense fallback={<RouteSuspenseFallback />}>
+                <PartsPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="parts/:partId"
+            element={
+              <Suspense fallback={<RouteSuspenseFallback />}>
+                <PartsPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="pricing"
+            element={
+              <Suspense fallback={<RouteSuspenseFallback />}>
+                <PricingPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="rfq"
+            element={
+              <Suspense fallback={<RouteSuspenseFallback />}>
+                <RfqListPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="rfq/new"
+            element={
+              <Suspense fallback={<RouteSuspenseFallback />}>
+                <RfqImportWizardPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="rfq/:id"
+            element={
+              <Suspense fallback={<RouteSuspenseFallback />}>
+                <QuotationBuilderPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="orders"
+            element={
+              <Suspense fallback={<RouteSuspenseFallback />}>
+                <OrdersPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="orders/:id"
+            element={
+              <Suspense fallback={<RouteSuspenseFallback />}>
+                <OrdersPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="documents"
+            element={
+              <Suspense fallback={<RouteSuspenseFallback />}>
+                <DocumentsPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="finance"
+            element={
+              <Suspense fallback={<RouteSuspenseFallback />}>
+                <FinancePage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="migration"
+            element={
+              <Suspense fallback={<RouteSuspenseFallback />}>
+                <MigrationPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="admin"
+            element={
+              <Suspense fallback={<RouteSuspenseFallback />}>
+                <AdminPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="reports"
+            element={
+              <Suspense fallback={<RouteSuspenseFallback />}>
+                <ReportsPage />
+              </Suspense>
+            }
+          />
+        </Route>
 
-          {/* Live GHL Operating App (/app/*) */}
-          <Route path="/app" element={<AppLayout />}>
-            <Route index element={<CommandCenterPage />} />
-            <Route path="speed-to-lead" element={<SpeedToLeadPage />} />
-            <Route path="pipeline" element={<PipelinePage />} />
-            <Route path="leads" element={<LeadsPage />} />
-            <Route path="conversations" element={<ConversationsPage />} />
-            <Route path="workflows" element={<WorkflowsPage />} />
-            <Route path="campaigns" element={<CampaignsPage />} />
-            <Route path="social" element={<SocialPage />} />
-            <Route path="calendar" element={<CalendarPage />} />
-            <Route path="reputation" element={<ReputationPage />} />
-            <Route path="reports" element={<ReportsPage />} />
-            <Route path="settings" element={<SettingsPage />} />
-          </Route>
-
-          {/* Fallback 404 */}
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-      </BrowserRouter>
-    </DemoStoreProvider>
+        {/* 404 Route */}
+        <Route
+          path="*"
+          element={
+            <Suspense fallback={<RouteSuspenseFallback />}>
+              <NotFoundPage />
+            </Suspense>
+          }
+        />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

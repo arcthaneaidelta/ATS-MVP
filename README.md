@@ -1,94 +1,102 @@
-# Groundwork — GoHighLevel Lead Capture, Nurture & Conversion System
+# Stratum — Multi-OEM Mining Spare Parts ERP & Commercial Memory
 
-> **A turnkey, high-fidelity operating prototype built for US Home Builders (Alder & Stone Homes, Charlotte NC).**  
-> Built on GoHighLevel architecture with strict US telephony compliance, 90-day buyer nurture automation, social lead bots, and a 60-minute handover training academy.
-
----
-
-## 🌟 Key Features & Interactive Demos
-
-1. **Speed-to-Lead Simulator (<7s):**
-   - Live millisecond countdown benchmark clock.
-   - 6-step instant response sequence: lead ingestion, 2-way SMS, PDF lookbook email, counselor mobile push, and call bridge.
-   - Interactive speed switcher (0.5x, 1x, 2x) and email fallback error mode.
-
-2. **90-Day Buyer Nurture with Time Scrubber:**
-   - Visual flowchart canvas displaying triggers, delay waits, SMS, email, and staff tasks.
-   - Interactive time scrubber slider (Day 0 to Day 90) with auto-play mode (120ms/day) that lights up executed nodes and populates the buyer's received touch timeline.
-
-3. **Social Comment-to-Lead Automation:**
-   - Interactive Instagram feed mockup.
-   - Commenting `"PRICE"` triggers an instant public reply, private DM lookbook link, and creates an ingested lead in the CRM tagged with `Source: Instagram Organic`.
-
-4. **Sales Pipeline & Kanban Board:**
-   - 7 active buyer stages (*New Inquiry*, *Contacted*, *Tour Booked*, *Tour Completed*, *Design Consult*, *Contract Signed*, *Closed Won*) plus *Nurture* and *Lost* lanes.
-   - Drag-and-drop card movements triggering automated workflow toasts.
-   - 480px slide-out Lead Detail Drawer with *"Simulate Next Step"* action.
-
-5. **Marketing Attribution & Funnel Analytics:**
-   - Visual 5-stage conversion funnel with dropoff rates.
-   - Full channel attribution table computing **Cost Per Lead** and **Cost Per Contract** across Meta, Google, Portals, and Realtors.
-   - Dynamic date range filter (*Last 7d*, *Last 30d*, *Last 90d*, *This Quarter*).
-
-6. **US Telephony & Housing Compliance:**
-   - A2P 10DLC brand trust status verification.
-   - Automated TCPA Quiet-Hours Send Guard (intercepts messages attempted outside 8:00 AM – 9:00 PM local time).
-   - Interactive Fair Housing copy scanner that audits prohibited demographic terminology.
-
-7. **Team Academy Handover Player:**
-   - 16:9 video player UI with 8 structured chapters equaling 60:00 runtime.
-   - Interactive progress ring persisted to browser storage, transcripts, and downloadable SOP checklists.
-
-8. **Three Conversion Funnels:**
-   - Harlow Creek Master-Planned Community Inquiry Funnel (with live split-view to CRM).
-   - 5-Step Floor Plan Matcher Interactive Quiz.
-   - Custom & On-Your-Lot Discovery Portal.
+**Tagline:** *"Every part number. Every price. One memory."*  
+**Brand Config:** Swappable via `src/config/brand.ts`.  
+**Stack:** React 18 + TypeScript + Vite + Tailwind CSS + Framer Motion. Zero external backend dependencies; all data is relationally modeled and persisted in `localStorage`.
 
 ---
 
-## 🚀 Netlify Deployment
+## 🎯 Overview & Real Problem Solved
+Mining equipment spare parts traders in Peru, Zambia, and international corridors resell parts across multiple OEMs (Epiroc, Sandvik, RESEMIN, Caterpillar, Komatsu, Normet, Montabert). Their margin is earned in the gap between supplier origin cost and customer quote.
 
-This repository is pre-configured for instant zero-configuration deployment on **Netlify**:
+Their core operational problem is a **memory problem**:
+- Decades of quotes, supplier lists, and invoices are scattered across Excel spreadsheets, Zoho Creator, Billdu, and Google Drive.
+- An incoming RFQ with 50+ lines takes hours of manual hunting, leading to inconsistent margins, forgotten supplier discounts, and missed aftermarket equivalents.
 
-- **Build command:** `npm run build`
-- **Publish directory:** `dist`
-- **SPA Routing:** Configured via `netlify.toml` and `public/_redirects` to handle client-side routing (`/* -> /index.html 200`) on page refresh.
-
-### To Deploy on Netlify:
-1. Log in to [Netlify](https://app.netlify.com/).
-2. Click **"Add new site"** → **"Import an existing project"**.
-3. Select **GitHub** and authorize access to `arcthaneaidelta/GroundWork-Go-High-Level-Automation`.
-4. Netlify will automatically detect:
-   - Base directory: `/`
-   - Build command: `npm run build`
-   - Publish directory: `dist`
-5. Click **"Deploy site"**.
+**Stratum** proves an integrated, relational system where **one part number opens everything connected to it**.
 
 ---
 
-## 💻 Local Development
+## 🚀 Key Features & Demo Journeys
+
+### 1. Landing Page & The Live Part-Number Resolver (`/`)
+- **Contour Reveal Entry Loader:** Adaptive SVG contour animation with brand reveal (session-cached).
+- **Hero Live Resolver:** Auto-types part numbers character-by-character; resolves cross-OEM aliases (e.g. typing Sandvik `SDV-4471-023` resolves to Canonical `STR-000412 · Shank Adapter T38` with chips for Epiroc and RESEMIN).
+- **The Problem Story:** Four scattered source cards (Excel, Billdu, Drive, Zoho) visually collapse into a single canonical part record.
+- **Capability Showcase:** Five interactive mini-components: Part memory, RFQ matching, price ladder, order fulfillment, and multi-entity switcher.
+- **Freelance Bid Companion (`#proposal`):**
+  - **Architecture Spec:** Interactive toggle comparing *Zoho Creator-first* vs. *Custom PostgreSQL/API Stack* with trade-offs.
+  - **4-Phase Delivery Timeline:** Expandable deliverables and milestone payments.
+  - **5-Stage Migration Plan:** Inventory → Normalize → Dedupe → Relink Documents → Client Validation.
+  - **SLA & Support Plans:** Essential, Growth, and Partner packages.
+
+### 2. Global Parts Master (`/app/parts`)
+- Multi-OEM table with instant fuzzy search (ignores hyphens, spaces, and casing).
+- Filters for OEM, category, and verified alternatives.
+- **Part Detail Drawer (`/app/parts/:partId`):**
+  - **Reference Map:** Visual tree showing canonical part connected to OEM, aftermarket, and superseded numbers.
+  - **Unified Commercial History:** Chronological ledger of customer quotes, sales, supplier quotes, and purchases.
+  - **Verified Alternatives:** Tested aftermarket equivalents with compatibility scores and tester verification.
+  - **Technical Specs & Documents:** Schematics, drawings, and metallurgy certificates.
+
+### 3. Pricing Intelligence (`/app/pricing`)
+- **Commercial Price Ladder:** Six-marker continuum (OEM list → Best supplier quote → Last purchase cost → Landed cost → Latest customer quote → Realized selling price) with an oxidized copper margin bracket.
+- **Landed Cost Breakdown Popover:** Unit cost + freight + customs duty + handling.
+- **SVG Price Timeline Trendline:** Chronological price progression across years.
+- **Quotation History Table:** Auto-identifies and badges the **Latest** quote reference.
+
+### 4. RFQ Import Wizard (`/app/rfq/new`)
+- **Step 1 — Upload:** Dropzone with **"Use Sample RFQ (Minera Andaluz · 42 lines)"** button.
+- **Step 2 — Progressive Match:** Progressive 60ms row resolution into Matched, Alternate OEM Match, Multiple Candidates, or Not Found. Inline exception resolver popover.
+- **Step 3 — Margin & Suppliers:** Global margin slider (default 24.6%) with one-click apply to all, row-level 3-supplier comparison, and below-margin warnings.
+- **Step 4 — Review & A4 Preview:** Live styled printable A4 quotation with entity letterhead, bank details, and instant PDF download / email simulation.
+
+### 5. Procurement & Orders Board (`/app/orders`)
+- Segmented Customer Orders (Sales) vs Supplier Orders (Purchases).
+- **Fulfillment Progress Bars:** Segmented bars showing delivered, in-transit, and backordered quantities.
+- **Partial Delivery Modal:** Enter waybills and delivered quantities with strict validation against outstanding quantities.
+
+### 6. Commercial Documents Hub (`/app/documents`)
+- Standardized trade documentation suite: Quotations, Supplier RFQs, Purchase Orders, Pro Forma Invoices, Commercial Invoices, Packing Lists, Credit Notes.
+- Printable A4 preview modal with formal entity letterhead and banking blocks.
+
+### 7. Finance & Debt Aging (`/app/finance`)
+- **5-Bucket Debt Aging Bar:** Current, 1–30, 31–60, 61–90, 90+ days overdue (clickable to filter invoices).
+- **Payment Milestones Schedule:** Advance, shipment, and acceptance milestone tracking.
+- **Register Payment Modal:** Instant ledger recalculation with data-update highlight ripple.
+- **Customer Statement Drawer:** Running commercial account balance.
+
+### 8. Migration Console (`/app/migration`)
+- Source cards for legacy Excel, Zoho, Billdu, and Google Drive.
+- **Duplicate Review Queue:** Side-by-side card pairs with difference highlights and keyboard shortcuts (`M` to merge, `K` to keep, `A` to add as alternative).
+- **Drive Document Relinking:** Matches legacy PDFs with transactions while preserving originals intact.
+
+### 9. Multi-Entity & Access Control (`/app/admin`)
+- Subsidiaries: Stratum Perú S.A.C. (PEN/USD), Stratum Zambia Ltd (ZMW/USD), Stratum International FZE (USD).
+- **Interactive Permission Matrix:** Click cells to cycle permissions (None → View → Edit → Approve).
+- **Role Simulation:** Instant test preview as Sales, Buyer, Finance, Director, or Admin.
+
+### 10. Global Command Palette (`⌘K` or `/`)
+- Global multi-OEM fuzzy search across parts, quotations, orders, and counterparties.
+
+---
+
+## 🛠️ Local Development
 
 ```bash
-# Clone the repository
-git clone https://github.com/arcthaneaidelta/GroundWork-Go-High-Level-Automation.git
-
 # Install dependencies
 npm install
 
-# Start local development server
+# Start development server
 npm run dev
 
-# Run production build
+# Run production build & verify bundle budgets
 npm run build
 ```
 
 ---
 
-## 🛠 Technology Stack
-
-- **Framework:** React 18 + TypeScript + Vite
-- **Styling:** Tailwind CSS v4 with bespoke residential architecture design tokens
-- **Typography:** Newsreader (display serif) & Instrument Sans (UI)
-- **Icons:** Lucide React
-- **Routing:** React Router v7
-- **State Management:** Reactive store with `sessionStorage` and `localStorage` persistence
+## 🎨 Design System Tokens
+- **Palette:** Warm stone (`#F5F2EC`), slate surfaces (`#FBFAF7`), deep green-slate primary (`#2E4A42`), oxidized copper accent (`#B4713B`).
+- **Typography:** Display (`Instrument Serif`), UI (`Inter`), Numbers/Codes (`JetBrains Mono` tabular-nums).
+- **No clichés:** Zero neon, zero stock photos, zero AI hype copy. Material honesty reflecting mineral extraction.
