@@ -1,122 +1,83 @@
-@import '@fontsource-variable/inter';
-@import '@fontsource/instrument-serif';
-@import '@fontsource/jetbrains-mono';
+@import "tailwindcss";
+@import "./styles/tokens.css";
+@import "./styles/base.css";
+@import "./styles/motion.css";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@theme {
+  --color-bg: #F6F3EC;
+  --color-surface: #FBF9F4;
+  --color-elevated: #FFFFFF;
+  --color-dark: #17323A;
+  --color-primary: #17323A;
+  --color-primary-hover: #10252B;
+  --color-primary-active: #0B1A1F;
+  --color-secondary: #5E7F78;
+  --color-accent: #B8864B;
+  --color-accent-text: #8A5F2B;
+  --color-accent-hover: #9F7138;
+  --color-text: #1B2625;
+  --color-text-2: #4A5755;
+  --color-text-3: #6F7A78;
+  --color-border: #E3DDD0;
+  --color-border-strong: #CFC7B6;
+  --color-success: #3E7A5B;
+  --color-warning: #B7791F;
+  --color-error: #A94438;
+  --color-info: #3F6C8C;
+  --color-hover: #EFEADF;
+  --color-active: #E6DFD0;
+  --color-focus: #3F6C8C;
 
-:root {
-  --bg: #F5F2EC;
-  --surface: #FBFAF7;
-  --surface-elevated: #FFFFFF;
-  --surface-sunken: #EFEBE3;
-  --ink-900: #1E2623;
-  --ink-700: #47524D;
-  --ink-500: #7B857F;
-  --ink-300: #B9BFBA;
-  --border: #E2DDD3;
-  --border-strong: #CFC9BD;
-  --primary: #2E4A42;
-  --primary-hover: #253D36;
-  --primary-tint: #E4ECE8;
-  --secondary: #5B6B76;
-  --accent: #B4713B;
-  --accent-tint: #F4E7DB;
-  --success: #3F7A5B;
-  --warning: #B2842B;
-  --error: #A4453B;
+  --font-serif: 'Newsreader', Georgia, serif;
+  --font-sans: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --shadow-sm: 0 1px 2px rgba(23, 50, 58, 0.06);
+  --shadow-md: 0 6px 20px -8px rgba(23, 50, 58, 0.14);
+  --shadow-lg: 0 24px 48px -16px rgba(23, 50, 58, 0.22);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+
+  --breakpoint-xs: 360px;
+  --breakpoint-sm: 480px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-family: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: #F6F3EC;
+  color: #1B2625;
 }
 
 body {
-  background-color: #F5F2EC;
-  color: #1E2623;
-  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
 }
 
-:focus-visible {
-  outline: 2px solid #2E4A42 !important;
-  outline-offset: 2px !important;
-}
-
-.font-mono, .mono-tabular {
-  font-variant-numeric: tabular-nums;
-}
-
-/* Data update highlight ripple */
-@keyframes dataUpdateTint {
-  0% {
-    background-color: #F4E7DB;
-  }
-  100% {
-    background-color: transparent;
-  }
-}
-
-.animate-data-tint {
-  animation: dataUpdateTint 900ms ease-out forwards;
-}
-
-/* Skeleton shimmer */
-@keyframes skeletonShimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
-.skeleton-shimmer {
-  background: linear-gradient(90deg, #EFEBE3 25%, #FBFAF7 50%, #EFEBE3 75%);
-  background-size: 200% 100%;
-  animation: skeletonShimmer 1.6s infinite ease-in-out;
-}
-
-/* Contour slow drift */
-@keyframes contourDrift {
-  0% {
-    transform: translate(0, 0);
-  }
-  50% {
-    transform: translate(-12px, -8px);
-  }
-  100% {
-    transform: translate(0, 0);
-  }
-}
-
-.animate-contour-drift {
-  animation: contourDrift 28s ease-in-out infinite;
-}
-
-/* Custom discreet scrollbars */
+/* Custom scrollbars that match the calm desk palette */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
+
 ::-webkit-scrollbar-track {
-  background: #EFEBE3;
+  background: #F6F3EC;
 }
+
 ::-webkit-scrollbar-thumb {
-  background: #CFC9BD;
+  background: #CFC7B6;
   border-radius: 4px;
 }
-::-webkit-scrollbar-thumb:hover {
-  background: #7B857F;
-}
 
-@media (prefers-reduced-motion: reduce) {
-  *, ::before, ::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-  .animate-contour-drift,
-  .skeleton-shimmer {
-    animation: none !important;
-  }
+::-webkit-scrollbar-thumb:hover {
+  background: #5E7F78;
 }

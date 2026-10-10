@@ -1,259 +1,147 @@
-export interface OEMReference {
-  oem: string;
-  number: string;
-  type: 'OEM' | 'Aftermarket' | 'Superseded';
-  compatibilityNote?: string;
+export type TenderStage = 'Find' | 'Decide' | 'Prepare' | 'Write' | 'Submit and learn'
+
+export type CustomOrderStatus =
+  | 'awaiting-intake'
+  | 'in-production'
+  | 'client-review'
+  | 'revisions-requested'
+  | 'delivered'
+
+export type IntakeFormId = 'A' | 'B' | 'C'
+
+export interface ServiceAddOn {
+  id: string
+  name: string
+  priceBwp: number
 }
 
-export interface VerifiedAlternative {
-  partId: string;
-  description: string;
-  manufacturer: string;
-  partNumber: string;
-  verifiedBy: string;
-  verifiedDate: string;
-  compatibilityScore: number;
-  notes: string;
+export interface ServiceItem {
+  id: string
+  slug: string
+  name: string
+  stage: TenderStage
+  turnaround: string
+  priceBwp: number
+  fromPrice: boolean
+  intakeFormId: IntakeFormId
+  intakeFormTitle: string
+  shortOutcome: string
+  description: string
+  inclusions: string[]
+  whatWeNeedFromYou: string[]
+  faqs: { question: string; answer: string }[]
+  relatedServiceIds: string[]
 }
 
-export interface PartDocument {
-  id: string;
-  title: string;
-  type: 'drawing' | 'spec_sheet' | 'certificate';
-  size: string;
-  date: string;
+export interface OrderItem {
+  id: string
+  orderNumber: string // e.g. "TV-2026-0148"
+  serviceId: string
+  serviceName: string
+  stage: TenderStage
+  clientEmail: string
+  clientName: string
+  companyName: string
+  status: CustomOrderStatus
+  tenderReference: string
+  tenderTitle: string
+  procuringEntity: string
+  closingDate: string
+  subtotalBwp: number
+  vatBwp: number
+  totalBwp: number
+  addOns: ServiceAddOn[]
+  writerName: string
+  writerRole: string
+  writerInitials: string
+  createdAt: string
+  updatedAt: string
+  expectedDraftDate: string
+  intakeSubmitted: boolean
+  draftFileUrl?: string
+  revisionComments?: string[]
+  revisionCount: number
+  deliveredDate?: string
+  rating?: number
 }
 
-export interface Part {
-  id: string;
-  description: string;
-  category: string;
-  oemReferences: OEMReference[];
-  verifiedAlternatives: VerifiedAlternative[];
-  specs: Record<string, string>;
-  applications: string[];
-  documents: PartDocument[];
-  replacesChain?: {
-    replaces?: string;
-    replacedBy?: string;
-  };
-  oemListPrice: number;
-  lastSupplierCost: number;
-  lastSupplierCurrency: 'USD' | 'PEN' | 'ZMW';
-  lastQuotedPrice: number;
-  lastQuotedDate: string;
-  lastQuotedRef: string;
-  timesSold12m: number;
-  stockPerEntity: Record<string, number>;
+export interface DocumentItem {
+  id: string
+  orderId?: string
+  orderNumber?: string
+  name: string
+  sizeFormatted: string
+  sizeBytes: number
+  fileType: 'PDF' | 'DOCX' | 'XLSX' | 'ZIP' | 'IMAGE'
+  source: 'tendervantage' | 'client'
+  uploadedAt: string
+  category: 'deliverable' | 'draft' | 'client-upload' | 'compliance'
 }
 
-export interface CommercialEvent {
-  id: string;
-  partId: string;
-  type: 'customer_quote' | 'customer_sale' | 'supplier_quote' | 'supplier_purchase';
-  date: string;
-  reference: string;
-  counterparty: string;
-  entityId: string;
-  qty: number;
-  unitPrice: number;
-  currency: 'USD' | 'PEN' | 'ZMW';
-  status: string;
-  marginPercent?: number;
-}
-
-export interface RfqLineItem {
-  id: string;
-  lineIndex: number;
-  rawPartNumber: string;
-  rawDescription: string;
-  qty: number;
-  status: 'matched' | 'matched_alternate' | 'multiple_candidates' | 'not_found';
-  matchedPartId?: string;
-  matchedViaOem?: string;
-  candidatePartIds?: string[];
-  suggestedSupplierCost: number;
-  suggestedSupplierName: string;
-  suggestedSupplierQuoteRef: string;
-  suggestedSupplierValidity: string;
-  alternativeSuppliers: Array<{
-    name: string;
-    price: number;
-    leadTimeDays: number;
-    quoteRef: string;
-    validity: string;
-    onTimeRate: number;
-  }>;
-  latestCustomerPrice: number;
-  latestCustomerQuoteRef: string;
-  latestCustomerDate: string;
-  targetMargin: number;
-  unitPrice: number;
-}
-
-export interface Quotation {
-  id: string;
-  rfqRef: string;
-  customer: string;
-  entityId: string;
-  date: string;
-  validityDate: string;
-  currency: 'USD' | 'PEN' | 'ZMW';
-  incoterm: 'FOB' | 'CIF' | 'DDP' | 'EXW';
-  paymentTerms: string;
-  status: 'Draft' | 'Needs review' | 'Sent' | 'Negotiating' | 'Won' | 'Lost';
-  lines: Array<{
-    partId: string;
-    description: string;
-    oemRef: string;
-    qty: number;
-    supplierCost: number;
-    unitPrice: number;
-    marginPercent: number;
-  }>;
-  subtotal: number;
-  total: number;
-  estimatedMargin: number;
-  version: number;
-  historyVersions?: Array<{
-    version: number;
-    date: string;
-    total: number;
-    notes: string;
-  }>;
-}
-
-export interface OrderLine {
-  partId: string;
-  description: string;
-  orderedQty: number;
-  deliveredQty: number;
-  inTransitQty: number;
-  unitPrice: number;
-  linkedSupplierOrderId?: string;
-}
-
-export interface DeliveryRecord {
-  id: string;
-  date: string;
-  waybill: string;
-  carrier: string;
-  items: Array<{ partId: string; qty: number }>;
-}
-
-export interface Order {
-  id: string;
-  type: 'customer' | 'supplier';
-  counterparty: string;
-  entityId: string;
-  date: string;
-  expectedDeliveryDate: string;
-  total: number;
-  currency: 'USD' | 'PEN' | 'ZMW';
-  paymentStatus: 'Unpaid' | 'Partial' | 'Paid';
-  fulfillmentStatus: 'Pending' | 'In Transit' | 'Partially Delivered' | 'Delivered';
-  lines: OrderLine[];
-  linkedOrders: string[];
-  deliveries: DeliveryRecord[];
-}
-
-export interface PaymentRecord {
-  id: string;
-  date: string;
-  amount: number;
-  currency: 'USD' | 'PEN' | 'ZMW';
-  method: string;
-  bankRef: string;
-  notes?: string;
-}
-
-export interface PaymentMilestone {
-  step: string;
-  percent: number;
-  amount: number;
-  dueDate: string;
-  paid: boolean;
-}
-
-export interface Invoice {
-  id: string;
-  type: 'receivable' | 'payable';
-  customer: string;
-  entityId: string;
-  issueDate: string;
-  dueDate: string;
-  amount: number;
-  paid: number;
-  balance: number;
-  currency: 'USD' | 'PEN' | 'ZMW';
-  status: 'Paid' | 'Partial' | 'Overdue' | 'Not due';
-  daysOverdue: number;
-  milestones: PaymentMilestone[];
-  payments: PaymentRecord[];
-}
-
-export interface DocumentRecord {
-  id: string;
-  type:
-    | 'Quotation'
-    | 'Supplier RFQ'
-    | 'Purchase Order'
-    | 'Pro Forma Invoice'
-    | 'Commercial Invoice'
-    | 'Packing List'
-    | 'Credit Note';
-  ref: string;
-  counterparty: string;
-  linkedRecord: string;
-  date: string;
-  amount: number;
-  currency: 'USD' | 'PEN' | 'ZMW';
-  status: 'Issued' | 'Pending' | 'Approved' | 'Sent' | 'Cancelled';
-  entityId: string;
-}
-
-export interface DuplicatePair {
-  id: string;
-  partA: {
-    id: string;
-    description: string;
-    oemRef: string;
-    category: string;
-  };
-  partB: {
-    id: string;
-    description: string;
-    oemRef: string;
-    category: string;
-  };
-  confidence: number;
-  status: 'pending' | 'merged' | 'kept_separate' | 'alternative_added';
-  differences: string[];
-}
-
-export interface DriveFileRelink {
-  id: string;
-  filename: string;
-  detectedInvoiceRef: string;
-  detectedPartId: string;
-  confidence: number;
-  originalPreserved: boolean;
-}
-
-export interface AttentionItem {
-  id: string;
-  iconType: 'unmatched' | 'expire' | 'duplicate' | 'overdue';
-  title: string;
-  entityId: string;
-  actionText: string;
-  actionRoute: string;
-  done: boolean;
+export interface MessageItem {
+  id: string
+  orderId: string
+  senderRole: 'client' | 'writer'
+  senderName: string
+  senderInitials: string
+  text: string
+  timestamp: string
 }
 
 export interface NotificationItem {
-  id: string;
-  title: string;
-  timestamp: string;
-  read: boolean;
-  type: 'info' | 'warning' | 'success';
+  id: string
+  clientEmail: string
+  title: string
+  description: string
+  timestamp: string
+  unread: boolean
+  orderId?: string
+  linkUrl?: string
+}
+
+export interface WebhookLogEntry {
+  id: string
+  endpoint: '/hooks/order-created' | '/hooks/order-status-changed' | '/hooks/intake-submitted' | '/hooks/order-delivered'
+  event: string
+  status: 200 | 500
+  durationMs: number
+  timestamp: string
+  headers: Record<string, string>
+  payload: Record<string, any>
+  canRetry?: boolean
+}
+
+export interface EmailMessage {
+  id: string
+  recipient: string
+  subject: string
+  trigger: string
+  sentAt: string
+  previewText: string
+  primaryButtonText?: string
+  primaryButtonUrl?: string
+  htmlBody: string
+  plainText: string
+  isRead: boolean
+}
+
+export interface ClientAccount {
+  id: string
+  name: string
+  email: string
+  companyName: string
+  location: string
+  cipaNumber: string
+  role: 'client' | 'staff'
+  situationDescription: string
+  demonstrates: string
+}
+
+export interface ScenarioFlags {
+  paymentDeclinedNext: boolean
+  paymentPendingNext: boolean
+  downloadFailsNext: boolean
+  slowNetwork: boolean
+  receiverFailure500: boolean
+  buildMapActive: boolean
 }

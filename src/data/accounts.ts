@@ -1,0 +1,48 @@
+import { ClientAccount } from '@/mock/types'
+
+export const DEMO_ACCOUNTS: ClientAccount[] = [
+  {
+    id: 'acc-naledi',
+    name: 'Naledi Mokgosi',
+    email: 'naledi@kgosimining.example',
+    companyName: 'Kgosi Mining Supplies (Pty) Ltd',
+    location: 'Gaborone, Botswana',
+    cipaNumber: 'BW0000189421',
+    role: 'client',
+    situationDescription: 'Mid-order client with active proposals in progress',
+    demonstrates: 'Dashboard with urgent actions, Awaiting Intake order, Client Review draft with revision feedback loop, and active messaging with writer.',
+  },
+  {
+    id: 'acc-thabo',
+    name: 'Thabo Seretse',
+    email: 'thabo@seretsecivil.example',
+    companyName: 'Seretse Civil Works (Pty) Ltd',
+    location: 'Francistown, Botswana',
+    cipaNumber: 'BW0000214890',
+    role: 'client',
+    situationDescription: 'First-time bidder starting from scratch',
+    demonstrates: 'Clean initial state, store ordering, simulated DPO payment, and end-to-end first intake form submission.',
+  },
+  {
+    id: 'acc-boitumelo',
+    name: 'Boitumelo Kgathi',
+    email: 'boitumelo@kalaharifresh.example',
+    companyName: 'Kalahari Fresh Logistics',
+    location: 'Maun, Botswana',
+    cipaNumber: 'BW0000094712',
+    role: 'client',
+    situationDescription: 'Returning multi-tender client with deep vault history',
+    demonstrates: 'Delivered orders, Revisions Requested status loop, multi-file document vault, past receipts, and post-bid debriefs.',
+  },
+  {
+    id: 'acc-lorato',
+    name: 'Lorato Dube',
+    email: 'lorato.dube@tendervantage.example',
+    companyName: 'TenderVantage (Head of Bids)',
+    location: 'Gaborone, Botswana',
+    cipaNumber: 'STAFF-BW01',
+    role: 'staff',
+    situationDescription: 'TenderVantage Head of Bids / Senior Writer',
+    demonstrates: 'Staff Delivery Desk: advance orders across the 5 custom statuses, deliver files, send draft to client, and trigger live webhook & email feedback.',
+  },
+]

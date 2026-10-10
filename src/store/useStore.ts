@@ -1,537 +1,848 @@
-import { create } from 'zustand';
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 import {
-  Part,
-  CommercialEvent,
-  Quotation,
-  Order,
-  Invoice,
-  DocumentRecord,
-  DuplicatePair,
-  DriveFileRelink,
-  AttentionItem,
+  ClientAccount,
+  CustomOrderStatus,
+  DocumentItem,
+  EmailMessage,
+  MessageItem,
   NotificationItem,
-} from '../mock/types';
+  OrderItem,
+  ScenarioFlags,
+  ServiceAddOn,
+  WebhookLogEntry,
+} from '@/mock/types'
+import { DEMO_ACCOUNTS } from '@/data/accounts'
 import {
-  SEED_PARTS,
-  SEED_COMMERCIAL_EVENTS,
-  SEED_QUOTATIONS,
   SEED_ORDERS,
-  SEED_INVOICES,
   SEED_DOCUMENTS,
-  SEED_DUPLICATE_PAIRS,
-  SEED_DRIVE_RELINKS,
-  SEED_ATTENTION_ITEMS,
+  SEED_MESSAGES,
   SEED_NOTIFICATIONS,
-} from '../mock/db';
+  SEED_WEBHOOKS,
+  SEED_EMAILS,
+} from '@/data/seed'
+import { SERVICES } from '@/data/services'
+import { advanceDemoTimeHours, getDemoNowISO, resetDemoClock } from '@/mock/clock'
+import { eventBus } from '@/mock/events'
+
+export interface CartItem {
+  serviceId: string
+  addOns: ServiceAddOn[]
+}
 
 export interface ToastItem {
-  id: string;
-  message: string;
-  type: 'success' | 'warning' | 'error' | 'info';
+  id: string
+  type: 'success' | 'info' | 'error'
+  title: string
+  message?: string
+  actionLabel?: string
+  actionUrl?: string
 }
 
-export type UserRole = 'Sales' | 'Buyer' | 'Finance' | 'Director' | 'Admin';
+interface StoreState {
+  // Session
+  currentUser: ClientAccount | null
+  setCurrentUser: (user: ClientAccount | null) => void
+  switchAccount: (accountId: string) => void
 
-export interface MigrationState {
-  inventory: number;
-  normalized: number;
-  deduped: number;
-  relinked: number;
-  validated: number;
-  isRunning: boolean;
-  lastSummary?: string;
-}
+  // Cart
+  cart: CartItem[]
+  couponCode: string | null
+  discountPercent: number
+  addToCart: (serviceId: string, addOns?: ServiceAddOn[]) => void
+  removeFromCart: (serviceId: string) => void
+  toggleAddOn: (serviceId: string, addOn: ServiceAddOn) => void
+  applyCoupon: (code: string) => { success: boolean; message: string }
+  clearCart: () => void
 
-export interface AppState {
-  // Navigation & User
-  currentEntity: 'consolidated' | 'peru' | 'zambia' | 'international';
-  currentRole: UserRole;
-  language: 'EN' | 'ES';
-  isCommandPaletteOpen: boolean;
-  clearedAttentionCount: number;
+  // Data
+  orders: OrderItem[]
+  documents: DocumentItem[]
+  messages: MessageItem[]
+  notifications: NotificationItem[]
+  emails: EmailMessage[]
+  webhooks: WebhookLogEntry[]
 
-  // Data collections
-  parts: Part[];
-  commercialEvents: CommercialEvent[];
-  quotations: Quotation[];
-  orders: Order[];
-  invoices: Invoice[];
-  documents: DocumentRecord[];
-  duplicatePairs: DuplicatePair[];
-  driveRelinks: DriveFileRelink[];
-  attentionItems: AttentionItem[];
-  notifications: NotificationItem[];
-  toasts: ToastItem[];
-  migrationState: MigrationState;
-  permissionMatrix: Record<string, Record<string, 'None' | 'View' | 'Edit' | 'Approve'>>;
-
-  // Actions
-  setEntity: (entity: 'consolidated' | 'peru' | 'zambia' | 'international') => void;
-  setRole: (role: UserRole) => void;
-  toggleLanguage: () => void;
-  setCommandPaletteOpen: (open: boolean) => void;
-  addToast: (message: string, type?: 'success' | 'warning' | 'error' | 'info') => void;
-  removeToast: (id: string) => void;
-  markAttentionDone: (id: string) => void;
-  markNotificationRead: (id: string) => void;
-  
-  // Commercial actions (relational ripples)
-  registerPayment: (params: {
-    invoiceId: string;
-    amount: number;
-    date: string;
-    method: string;
-    bankRef: string;
-  }) => void;
-  recordDelivery: (params: {
-    orderId: string;
-    items: Array<{ partId: string; qty: number }>;
-    waybill: string;
-    carrier: string;
-    date: string;
-  }) => void;
-  mergeDuplicatePair: (pairId: string, action: 'merge' | 'keep_separate' | 'alternative_added') => void;
-  addQuotation: (quotation: Quotation) => void;
-  convertQuotationToOrder: (quotationId: string) => string;
-  runSampleMigration: () => Promise<void>;
-  cyclePermission: (role: string, module: string) => void;
-  resetDemoData: () => void;
-}
-
-const DEFAULT_PERMISSION_MATRIX: Record<string, Record<string, 'None' | 'View' | 'Edit' | 'Approve'>> = {
-  Sales: { Parts: 'View', Pricing: 'View', RFQ: 'Edit', Orders: 'View', Finance: 'None', Admin: 'None' },
-  Buyer: { Parts: 'View', Pricing: 'Edit', RFQ: 'View', Orders: 'Edit', Finance: 'None', Admin: 'None' },
-  Finance: { Parts: 'View', Pricing: 'View', RFQ: 'View', Orders: 'View', Finance: 'Approve', Admin: 'None' },
-  Director: { Parts: 'Approve', Pricing: 'Approve', RFQ: 'Approve', Orders: 'Approve', Finance: 'Approve', Admin: 'View' },
-  Admin: { Parts: 'Approve', Pricing: 'Approve', RFQ: 'Approve', Orders: 'Approve', Finance: 'Approve', Admin: 'Approve' },
-};
-
-const STORAGE_KEY = 'stratum-demo-v1';
-
-function loadPersistedState(): Partial<AppState> | null {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    return JSON.parse(raw);
-  } catch {
-    return null;
+  // Scenarios and Demo Guide
+  scenarios: ScenarioFlags
+  setScenarioFlag: (key: keyof ScenarioFlags, val: boolean) => void
+  demoGuideOpen: boolean
+  setDemoGuideOpen: (open: boolean) => void
+  demoGuideTab: 'guide' | 'inbox' | 'webhooks' | 'buildmap' | 'handover'
+  setDemoGuideTab: (tab: 'guide' | 'inbox' | 'webhooks' | 'buildmap' | 'handover') => void
+  suggestedSteps: {
+    browseStore: boolean
+    payCheckout: boolean
+    submitIntake: boolean
+    staffAdvance: boolean
+    inspectWebhooks: boolean
   }
+  markSuggestedStep: (step: keyof StoreState['suggestedSteps']) => void
+
+  // Toasts
+  toasts: ToastItem[]
+  addToast: (toast: Omit<ToastItem, 'id'>) => void
+  removeToast: (id: string) => void
+
+  // Domain Actions
+  placeOrder: (payload: {
+    serviceId: string
+    addOns: ServiceAddOn[]
+    clientDetails: {
+      name: string
+      email: string
+      companyName: string
+      cipaNumber: string
+      phone: string
+      notes?: string
+    }
+    tenderDetails?: {
+      reference: string
+      title: string
+      procuringEntity: string
+      closingDate: string
+    }
+  }) => OrderItem
+
+  updateOrderStatus: (
+    orderId: string,
+    newStatus: CustomOrderStatus,
+    meta?: { changedBy?: string; note?: string; fileUrl?: string }
+  ) => void
+
+  submitIntake: (
+    orderId: string,
+    formId: 'A' | 'B' | 'C',
+    answers: Record<string, any>,
+    filesUploaded?: string[]
+  ) => void
+
+  requestRevisions: (orderId: string, comment: string, attachFileUrl?: string) => void
+  approveDraft: (orderId: string) => void
+  uploadDocument: (doc: Partial<DocumentItem>) => void
+  sendMessage: (orderId: string, text: string) => void
+  markNotificationRead: (id: string) => void
+  markAllNotificationsRead: () => void
+  markEmailRead: (id: string) => void
+  retryWebhook: (id: string) => void
+  fastForward24h: () => void
+  resetDemoData: () => void
 }
 
-function saveState(state: AppState) {
-  try {
-    const subset = {
-      currentEntity: state.currentEntity,
-      currentRole: state.currentRole,
-      language: state.language,
-      clearedAttentionCount: state.clearedAttentionCount,
-      parts: state.parts,
-      commercialEvents: state.commercialEvents,
-      quotations: state.quotations,
-      orders: state.orders,
-      invoices: state.invoices,
-      documents: state.documents,
-      duplicatePairs: state.duplicatePairs,
-      driveRelinks: state.driveRelinks,
-      attentionItems: state.attentionItems,
-      notifications: state.notifications,
-      migrationState: state.migrationState,
-      permissionMatrix: state.permissionMatrix,
-    };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(subset));
-  } catch (err) {
-    console.error('Failed to persist to localStorage', err);
-  }
+const INITIAL_SCENARIOS: ScenarioFlags = {
+  paymentDeclinedNext: false,
+  paymentPendingNext: false,
+  downloadFailsNext: false,
+  slowNetwork: false,
+  receiverFailure500: false,
+  buildMapActive: false,
 }
 
-export const useStore = create<AppState>((set, get) => {
-  const persisted = loadPersistedState();
+export const useStore = create<StoreState>()(
+  persist(
+    (set, get) => ({
+      // Default to Naledi Mokgosi for immediate client dashboard experience
+      currentUser: DEMO_ACCOUNTS[0],
+      setCurrentUser: (user) => set({ currentUser: user }),
+      switchAccount: (accountId) => {
+        const found = DEMO_ACCOUNTS.find((a) => a.id === accountId)
+        if (found) {
+          set({ currentUser: found })
+          get().addToast({
+            type: 'info',
+            title: `Switched to ${found.name}`,
+            message: `${found.companyName} (${found.role === 'staff' ? 'Staff' : 'Client'})`,
+          })
+        }
+      },
 
-  const initialState = {
-    currentEntity: (persisted?.currentEntity as any) || 'peru',
-    currentRole: persisted?.currentRole || 'Sales',
-    language: persisted?.language || 'EN',
-    isCommandPaletteOpen: false,
-    clearedAttentionCount: persisted?.clearedAttentionCount || 0,
-
-    parts: persisted?.parts || SEED_PARTS,
-    commercialEvents: persisted?.commercialEvents || SEED_COMMERCIAL_EVENTS,
-    quotations: persisted?.quotations || SEED_QUOTATIONS,
-    orders: persisted?.orders || SEED_ORDERS,
-    invoices: persisted?.invoices || SEED_INVOICES,
-    documents: persisted?.documents || SEED_DOCUMENTS,
-    duplicatePairs: persisted?.duplicatePairs || SEED_DUPLICATE_PAIRS,
-    driveRelinks: persisted?.driveRelinks || SEED_DRIVE_RELINKS,
-    attentionItems: persisted?.attentionItems || SEED_ATTENTION_ITEMS,
-    notifications: persisted?.notifications || SEED_NOTIFICATIONS,
-    toasts: [],
-    migrationState: persisted?.migrationState || {
-      inventory: 18420,
-      normalized: 14200,
-      deduped: 4812,
-      relinked: 2860,
-      validated: 97.2,
-      isRunning: false,
-      lastSummary: '4,812 parts consolidated from 6,903 raw rows · 1,214 duplicates resolved · 97.2% of invoices linked to parts',
-    },
-    permissionMatrix: persisted?.permissionMatrix || DEFAULT_PERMISSION_MATRIX,
-  };
-
-  return {
-    ...initialState,
-
-    setEntity: (entity) => {
-      set({ currentEntity: entity });
-      saveState(get());
-    },
-
-    setRole: (role) => {
-      set({ currentRole: role });
-      get().addToast(`Switched active view to role: ${role}`, 'info');
-      saveState(get());
-    },
-
-    toggleLanguage: () => {
-      const nextLang = get().language === 'EN' ? 'ES' : 'EN';
-      set({ language: nextLang });
-      get().addToast(`Language toggle: ${nextLang} (Visual sample)`, 'info');
-      saveState(get());
-    },
-
-    setCommandPaletteOpen: (open) => set({ isCommandPaletteOpen: open }),
-
-    addToast: (message, type = 'success') => {
-      const id = 'toast-' + Math.random().toString(36).substring(2, 9);
-      set((state) => ({
-        toasts: [...state.toasts, { id, message, type }],
-      }));
-      setTimeout(() => {
-        get().removeToast(id);
-      }, 4000);
-    },
-
-    removeToast: (id) => {
-      set((state) => ({
-        toasts: state.toasts.filter((t) => t.id !== id),
-      }));
-    },
-
-    markAttentionDone: (id) => {
-      set((state) => ({
-        attentionItems: state.attentionItems.map((item) =>
-          item.id === id ? { ...item, done: true } : item
-        ),
-        clearedAttentionCount: state.clearedAttentionCount + 1,
-      }));
-      get().addToast('Action marked completed', 'success');
-      saveState(get());
-    },
-
-    markNotificationRead: (id) => {
-      set((state) => ({
-        notifications: state.notifications.map((n) =>
-          n.id === id ? { ...n, read: true } : n
-        ),
-      }));
-      saveState(get());
-    },
-
-    registerPayment: ({ invoiceId, amount, date, method, bankRef }) => {
-      set((state) => {
-        const nextInvoices = state.invoices.map((inv) => {
-          if (inv.id !== invoiceId) return inv;
-          const nextPaid = inv.paid + amount;
-          const nextBalance = Math.max(0, inv.amount - nextPaid);
-          const nextStatus = nextBalance === 0 ? 'Paid' : 'Partial';
-
-          const nextMilestones = inv.milestones.map((ms, idx) => {
-            // mark earliest unpaid milestone paid if covered
-            if (!ms.paid && nextPaid >= ms.amount) {
-              return { ...ms, paid: true };
-            }
-            return ms;
-          });
-
-          return {
-            ...inv,
-            paid: nextPaid,
-            balance: nextBalance,
-            status: nextStatus as any,
-            milestones: nextMilestones,
-            payments: [
-              ...inv.payments,
-              {
-                id: 'pay-' + Date.now(),
-                date,
-                amount,
-                currency: inv.currency,
-                method,
-                bankRef,
-              },
-            ],
-          };
-        });
-
-        // Add commercial activity event
-        const inv = state.invoices.find((i) => i.id === invoiceId);
-        const newNotif: NotificationItem = {
-          id: 'notif-' + Date.now(),
-          title: `Payment of USD ${amount.toLocaleString()} registered against ${invoiceId}`,
-          timestamp: new Date().toISOString(),
-          read: false,
+      // Cart
+      cart: [],
+      couponCode: null,
+      discountPercent: 0,
+      addToCart: (serviceId, addOns = []) => {
+        const existing = get().cart.find((c) => c.serviceId === serviceId)
+        if (existing) {
+          // Service already in cart (1 per service strictly)
+          return
+        }
+        set((state) => ({
+          cart: [...state.cart, { serviceId, addOns }],
+        }))
+        const srv = SERVICES.find((s) => s.id === serviceId)
+        get().addToast({
           type: 'success',
-        };
-
-        return {
-          invoices: nextInvoices,
-          notifications: [newNotif, ...state.notifications],
-        };
-      });
-
-      get().addToast(`Payment of USD ${amount.toLocaleString()} registered against ${invoiceId}`, 'success');
-      saveState(get());
-    },
-
-    recordDelivery: ({ orderId, items, waybill, carrier, date }) => {
-      set((state) => {
-        const nextOrders = state.orders.map((order) => {
-          if (order.id !== orderId) return order;
-
-          const nextLines = order.lines.map((line) => {
-            const deliveredItem = items.find((i) => i.partId === line.partId);
-            if (!deliveredItem) return line;
-            const newDelivered = line.deliveredQty + deliveredItem.qty;
-            const newInTransit = Math.max(0, line.inTransitQty - deliveredItem.qty);
+          title: 'Added to cart',
+          message: srv?.name,
+          actionLabel: 'View cart',
+          actionUrl: '/cart',
+        })
+        get().markSuggestedStep('browseStore')
+      },
+      removeFromCart: (serviceId) => {
+        const removedItem = get().cart.find((c) => c.serviceId === serviceId)
+        set((state) => ({
+          cart: state.cart.filter((c) => c.serviceId !== serviceId),
+        }))
+        if (removedItem) {
+          const srv = SERVICES.find((s) => s.id === serviceId)
+          get().addToast({
+            type: 'info',
+            title: 'Item removed',
+            message: `${srv?.name ?? 'Service'} was removed from cart.`,
+          })
+        }
+      },
+      toggleAddOn: (serviceId, addOn) => {
+        set((state) => ({
+          cart: state.cart.map((item) => {
+            if (item.serviceId !== serviceId) return item
+            const hasAddOn = item.addOns.some((a) => a.id === addOn.id)
             return {
-              ...line,
-              deliveredQty: newDelivered,
-              inTransitQty: newInTransit,
-            };
-          });
+              ...item,
+              addOns: hasAddOn
+                ? item.addOns.filter((a) => a.id !== addOn.id)
+                : [...item.addOns, addOn],
+            }
+          }),
+        }))
+      },
+      applyCoupon: (code) => {
+        if (code.trim().toUpperCase() === 'FIRSTBID10') {
+          set({ couponCode: 'FIRSTBID10', discountPercent: 10 })
+          return { success: true, message: 'Coupon applied! 10% discount on order.' }
+        }
+        return { success: false, message: 'That code is not valid.' }
+      },
+      clearCart: () => set({ cart: [], couponCode: null, discountPercent: 0 }),
 
-          const allDelivered = nextLines.every((l) => l.deliveredQty >= l.orderedQty);
-          const anyDelivered = nextLines.some((l) => l.deliveredQty > 0);
-          const nextStatus = allDelivered
-            ? 'Delivered'
-            : anyDelivered
-            ? 'Partially Delivered'
-            : order.fulfillmentStatus;
+      // Data
+      orders: SEED_ORDERS,
+      documents: SEED_DOCUMENTS,
+      messages: SEED_MESSAGES,
+      notifications: SEED_NOTIFICATIONS,
+      emails: SEED_EMAILS,
+      webhooks: SEED_WEBHOOKS,
 
-          return {
-            ...order,
-            lines: nextLines,
-            fulfillmentStatus: nextStatus as any,
-            deliveries: [
-              ...order.deliveries,
-              {
-                id: 'del-' + Date.now(),
-                date,
-                waybill,
-                carrier,
-                items,
-              },
-            ],
-          };
-        });
+      // Scenarios and Demo Guide
+      scenarios: INITIAL_SCENARIOS,
+      setScenarioFlag: (key, val) => {
+        set((state) => ({
+          scenarios: { ...state.scenarios, [key]: val },
+        }))
+        get().addToast({
+          type: 'info',
+          title: `Scenario updated`,
+          message: `${key} is now ${val ? 'ON' : 'OFF'}`,
+        })
+      },
+      demoGuideOpen: false,
+      setDemoGuideOpen: (open) => set({ demoGuideOpen: open }),
+      demoGuideTab: 'guide',
+      setDemoGuideTab: (tab) => set({ demoGuideTab: tab }),
+      suggestedSteps: {
+        browseStore: false,
+        payCheckout: false,
+        submitIntake: false,
+        staffAdvance: false,
+        inspectWebhooks: false,
+      },
+      markSuggestedStep: (step) =>
+        set((state) => ({
+          suggestedSteps: { ...state.suggestedSteps, [step]: true },
+        })),
 
-        const newNotif: NotificationItem = {
-          id: 'notif-' + Date.now(),
-          title: `Delivery ${waybill} recorded for order ${orderId}`,
-          timestamp: new Date().toISOString(),
-          read: false,
-          type: 'success',
-        };
+      // Toasts
+      toasts: [],
+      addToast: (t) => {
+        const id = 'toast-' + Math.random().toString(36).substring(2, 9)
+        const toast: ToastItem = { ...t, id }
+        set((state) => ({ toasts: [...state.toasts.slice(-2), toast] }))
+        setTimeout(() => {
+          get().removeToast(id)
+        }, 8000)
+      },
+      removeToast: (id) =>
+        set((state) => ({ toasts: state.toasts.filter((t) => t.id !== id) })),
 
-        return {
-          orders: nextOrders,
-          notifications: [newNotif, ...state.notifications],
-        };
-      });
+      // Domain Actions
+      placeOrder: ({ serviceId, addOns, clientDetails, tenderDetails }) => {
+        const srv = SERVICES.find((s) => s.id === serviceId) || SERVICES[0]
+        const orderNum = `TV-2026-0${150 + get().orders.length}`
+        const addOnsTotal = addOns.reduce((sum, a) => sum + a.priceBwp, 0)
+        let subtotal = srv.priceBwp + addOnsTotal
+        if (get().discountPercent > 0) {
+          subtotal = subtotal * (1 - get().discountPercent / 100)
+        }
+        const vat = Math.round(subtotal * 0.14 * 100) / 100
+        const total = subtotal + vat
 
-      get().addToast(`Partial delivery ${waybill} recorded successfully`, 'success');
-      saveState(get());
-    },
+        const closingDate = tenderDetails?.closingDate || '2026-11-04'
+        const tenderRef = tenderDetails?.reference || 'TDR/2026/088'
+        const tenderTitle = tenderDetails?.title || 'Supply and Delivery of Services'
+        const procuringEntity = tenderDetails?.procuringEntity || 'Botswana Public Procurement'
 
-    mergeDuplicatePair: (pairId, action) => {
-      set((state) => {
-        const pair = state.duplicatePairs.find((p) => p.id === pairId);
-        if (!pair) return state;
-
-        const nextStatus: DuplicatePair['status'] =
-          action === 'merge' ? 'merged' : action === 'keep_separate' ? 'kept_separate' : 'alternative_added';
-        const nextPairs: DuplicatePair[] = state.duplicatePairs.map((p) =>
-          p.id === pairId ? { ...p, status: nextStatus } : p
-        );
-
-        let toastMsg = 'Duplicate resolved';
-        if (action === 'merge') {
-          toastMsg = `Merged. OEM references consolidated under ${pair.partA.id}.`;
-        } else if (action === 'alternative_added') {
-          toastMsg = `Added ${pair.partB.id} as verified alternative to ${pair.partA.id}.`;
-        } else {
-          toastMsg = `Kept ${pair.partA.id} and ${pair.partB.id} as separate distinct parts.`;
+        const newOrder: OrderItem = {
+          id: 'ord-' + Date.now(),
+          orderNumber: orderNum,
+          serviceId: srv.id,
+          serviceName: srv.name,
+          stage: srv.stage,
+          clientEmail: clientDetails.email,
+          clientName: clientDetails.name,
+          companyName: clientDetails.companyName,
+          status: 'awaiting-intake',
+          tenderReference: tenderRef,
+          tenderTitle: tenderTitle,
+          procuringEntity: procuringEntity,
+          closingDate: closingDate,
+          subtotalBwp: subtotal,
+          vatBwp: vat,
+          totalBwp: total,
+          addOns: addOns,
+          writerName: 'Kabo Ntshole',
+          writerRole: 'Senior Bid Writer',
+          writerInitials: 'KN',
+          createdAt: getDemoNowISO(),
+          updatedAt: getDemoNowISO(),
+          expectedDraftDate: '2026-10-18',
+          intakeSubmitted: false,
+          revisionCount: 0,
         }
 
-        return {
-          duplicatePairs: nextPairs,
-          toasts: [
-            ...state.toasts,
-            { id: 't-' + Date.now(), message: toastMsg, type: 'success' },
-          ],
-        };
-      });
-      saveState(get());
-    },
-
-    addQuotation: (quotation) => {
-      set((state) => ({
-        quotations: [quotation, ...state.quotations],
-        documents: [
-          {
-            id: 'doc-' + Date.now(),
-            type: 'Quotation',
-            ref: quotation.id,
-            counterparty: quotation.customer,
-            linkedRecord: quotation.rfqRef,
-            date: quotation.date,
-            amount: quotation.total,
-            currency: quotation.currency,
-            status: 'Issued',
-            entityId: quotation.entityId,
+        // Webhook log
+        const webhookStatus = get().scenarios.receiverFailure500 ? 500 : 200
+        const webhookLog: WebhookLogEntry = {
+          id: 'wh-' + Date.now(),
+          endpoint: '/hooks/order-created',
+          event: 'order.created',
+          status: webhookStatus,
+          durationMs: 148,
+          timestamp: getDemoNowISO(),
+          headers: {
+            'content-type': 'application/json',
+            'user-agent': 'WooCommerce/9.2.0 Webhook Hookshot',
+            'x-wc-webhook-topic': 'order.created',
           },
-          ...state.documents,
-        ],
-        notifications: [
-          {
-            id: 'notif-' + Date.now(),
-            title: `Quotation ${quotation.id} generated (${quotation.lines.length} lines, est. margin ${quotation.estimatedMargin}%)`,
-            timestamp: new Date().toISOString(),
-            read: false,
-            type: 'success',
+          payload: {
+            event: 'order.created',
+            order_id: parseInt(orderNum.replace(/\D/g, '')),
+            number: orderNum,
+            status: 'awaiting-intake',
+            services: [srv.name],
+            total_bwp: total,
+            customer: {
+              name: clientDetails.name,
+              company: clientDetails.companyName,
+              email: clientDetails.email,
+              phone: clientDetails.phone,
+            },
+            tender_closing_date: closingDate,
           },
-          ...state.notifications,
-        ],
-      }));
-      get().addToast(`Quotation ${quotation.id} created successfully`, 'success');
-      saveState(get());
-    },
+          canRetry: webhookStatus === 500,
+        }
 
-    convertQuotationToOrder: (quotationId) => {
-      const q = get().quotations.find((item) => item.id === quotationId);
-      if (!q) return '';
+        // Email confirmation
+        const newEmail: EmailMessage = {
+          id: 'email-' + Date.now(),
+          recipient: clientDetails.email,
+          subject: `Order ${orderNum} confirmed`,
+          trigger: 'Order paid',
+          sentAt: getDemoNowISO(),
+          previewText: `Thank you for your order. Complete intake form so we can start work on ${srv.name}.`,
+          primaryButtonText: 'Complete your intake',
+          primaryButtonUrl: `/portal/intake/${srv.intakeFormId}?orderId=${newOrder.id}`,
+          isRead: false,
+          plainText: `Order ${orderNum} confirmed.\nService: ${srv.name}\nTotal: P${total.toFixed(2)}\nComplete intake: https://tendervantage.example/portal/intake/${srv.intakeFormId}?orderId=${newOrder.id}`,
+          htmlBody: `<h2>Order ${orderNum} confirmed</h2><p>Thank you for ordering ${srv.name}. Please complete intake.</p>`,
+        }
 
-      const newPoId = `PO-${q.entityId.toUpperCase().slice(0, 2)}-${Math.floor(1000 + Math.random() * 9000)}`;
-      const newOrder: Order = {
-        id: newPoId,
-        type: 'customer',
-        counterparty: q.customer,
-        entityId: q.entityId,
-        date: new Date().toISOString().split('T')[0],
-        expectedDeliveryDate: '2026-11-15',
-        total: q.total,
-        currency: q.currency,
-        paymentStatus: 'Unpaid',
-        fulfillmentStatus: 'Pending',
-        lines: q.lines.map((l) => ({
-          partId: l.partId,
-          description: l.description,
-          orderedQty: l.qty,
-          deliveredQty: 0,
-          inTransitQty: 0,
-          unitPrice: l.unitPrice,
+        // Notification
+        const notif: NotificationItem = {
+          id: 'notif-' + Date.now(),
+          clientEmail: clientDetails.email,
+          title: `Order confirmed: ${orderNum}`,
+          description: `Action needed: complete ${srv.intakeFormTitle} before work begins.`,
+          timestamp: getDemoNowISO(),
+          unread: true,
+          orderId: newOrder.id,
+          linkUrl: `/portal/intake/${srv.intakeFormId}?orderId=${newOrder.id}`,
+        }
+
+        set((state) => ({
+          orders: [newOrder, ...state.orders],
+          webhooks: [webhookLog, ...state.webhooks],
+          emails: [newEmail, ...state.emails],
+          notifications: [notif, ...state.notifications],
+          cart: [],
+        }))
+
+        get().markSuggestedStep('payCheckout')
+        eventBus.emit('order.created', newOrder)
+
+        get().addToast({
+          type: 'info',
+          title: `Email sent to ${clientDetails.email}`,
+          message: `Subject: Order ${orderNum} confirmed`,
+          actionLabel: 'View in inbox',
+          actionUrl: '#inbox',
+        })
+
+        return newOrder
+      },
+
+      updateOrderStatus: (orderId, newStatus, meta) => {
+        const order = get().orders.find((o) => o.id === orderId)
+        if (!order) return
+
+        const oldStatus = order.status
+        const updatedOrders = get().orders.map((o) => {
+          if (o.id !== orderId) return o
+          return {
+            ...o,
+            status: newStatus,
+            updatedAt: getDemoNowISO(),
+            draftFileUrl: meta?.fileUrl || o.draftFileUrl,
+            deliveredDate: newStatus === 'delivered' ? getDemoNowISO() : o.deliveredDate,
+          }
+        })
+
+        // Webhook log
+        const webhookStatus = get().scenarios.receiverFailure500 ? 500 : 200
+        const isDelivered = newStatus === 'delivered'
+        const endpoint = isDelivered ? '/hooks/order-delivered' : '/hooks/order-status-changed'
+        const eventName = isDelivered ? 'order.delivered' : 'order.status_changed'
+
+        const webhookLog: WebhookLogEntry = {
+          id: 'wh-' + Date.now(),
+          endpoint: endpoint as any,
+          event: eventName,
+          status: webhookStatus,
+          durationMs: 160,
+          timestamp: getDemoNowISO(),
+          headers: {
+            'content-type': 'application/json',
+            'user-agent': 'WooCommerce/9.2.0 Webhook Hookshot',
+            'x-wc-webhook-topic': eventName,
+          },
+          payload: isDelivered
+            ? {
+                event: 'order.delivered',
+                order_id: parseInt(order.orderNumber.replace(/\D/g, '')),
+                number: order.orderNumber,
+                delivered_at: getDemoNowISO(),
+                service: order.serviceName,
+                customer_email: order.clientEmail,
+                file_manifest: [`${order.orderNumber}-Final-Submission-Pack.zip`],
+              }
+            : {
+                event: 'order.status_changed',
+                order_id: parseInt(order.orderNumber.replace(/\D/g, '')),
+                number: order.orderNumber,
+                from_status: oldStatus,
+                to_status: newStatus,
+                changed_by: meta?.changedBy || 'staff:delivery-desk',
+                changed_at: getDemoNowISO(),
+                service: order.serviceName,
+                customer_email: order.clientEmail,
+              },
+          canRetry: webhookStatus === 500,
+        }
+
+        // Email generation based on target status
+        let newEmail: EmailMessage | null = null
+        if (newStatus === 'client-review') {
+          newEmail = {
+            id: 'email-' + Date.now(),
+            recipient: order.clientEmail,
+            subject: `Your draft is ready for review: ${order.orderNumber}`,
+            trigger: 'Draft sent to client',
+            sentAt: getDemoNowISO(),
+            previewText: `Your draft for ${order.serviceName} is ready in the portal.`,
+            primaryButtonText: 'Review draft',
+            primaryButtonUrl: `/portal/orders/${order.id}`,
+            isRead: false,
+            plainText: `Your draft is ready for review. Order ${order.orderNumber}.`,
+            htmlBody: `<h2>Your draft is ready for review</h2><p>Order ${order.orderNumber}</p>`,
+          }
+        } else if (newStatus === 'delivered') {
+          newEmail = {
+            id: 'email-' + Date.now(),
+            recipient: order.clientEmail,
+            subject: `Your files are ready: ${order.orderNumber} delivered`,
+            trigger: 'Delivered',
+            sentAt: getDemoNowISO(),
+            previewText: `Final files for ${order.serviceName} are ready to download.`,
+            primaryButtonText: 'Download your files',
+            primaryButtonUrl: `/portal/orders/${order.id}`,
+            isRead: false,
+            plainText: `Your files are ready. Order ${order.orderNumber} delivered.`,
+            htmlBody: `<h2>Your files are ready</h2><p>Order ${order.orderNumber} delivered.</p>`,
+          }
+        }
+
+        const notif: NotificationItem = {
+          id: 'notif-' + Date.now(),
+          clientEmail: order.clientEmail,
+          title: `Status update: ${order.orderNumber}`,
+          description: `Order moved to ${newStatus.replace('-', ' ').toUpperCase()}`,
+          timestamp: getDemoNowISO(),
+          unread: true,
+          orderId: order.id,
+          linkUrl: `/portal/orders/${order.id}`,
+        }
+
+        set((state) => ({
+          orders: updatedOrders,
+          webhooks: [webhookLog, ...state.webhooks],
+          emails: newEmail ? [newEmail, ...state.emails] : state.emails,
+          notifications: [notif, ...state.notifications],
+        }))
+
+        get().markSuggestedStep('staffAdvance')
+        eventBus.emit('order.status_changed', { orderId, fromStatus: oldStatus, toStatus: newStatus })
+
+        get().addToast({
+          type: 'success',
+          title: `Status updated`,
+          message: `${order.orderNumber} is now ${newStatus.replace('-', ' ')}`,
+        })
+
+        if (newEmail) {
+          get().addToast({
+            type: 'info',
+            title: `Email sent to ${order.clientEmail}`,
+            message: newEmail.subject,
+          })
+        }
+      },
+
+      submitIntake: (orderId, formId, answers, filesUploaded = []) => {
+        const order = get().orders.find((o) => o.id === orderId)
+        if (!order) return
+
+        const updatedOrders = get().orders.map((o) => {
+          if (o.id !== orderId) return o
+          return {
+            ...o,
+            status: 'in-production' as CustomOrderStatus,
+            intakeSubmitted: true,
+            updatedAt: getDemoNowISO(),
+          }
+        })
+
+        // Webhook log for intake
+        const webhookStatus = get().scenarios.receiverFailure500 ? 500 : 200
+        const webhookLog: WebhookLogEntry = {
+          id: 'wh-' + Date.now(),
+          endpoint: '/hooks/intake-submitted',
+          event: 'intake.submitted',
+          status: webhookStatus,
+          durationMs: 185,
+          timestamp: getDemoNowISO(),
+          headers: {
+            'content-type': 'application/json',
+            'user-agent': 'WPForms-Pro/1.8.8 Webhook Dispatcher',
+            'x-wpforms-form-id': `form-${formId.toLowerCase()}`,
+          },
+          payload: {
+            order_id: parseInt(order.orderNumber.replace(/\D/g, '')),
+            number: order.orderNumber,
+            form_id: formId,
+            form_name: `Form ${formId}`,
+            customer_email: order.clientEmail,
+            file_count: filesUploaded.length,
+            answers: answers,
+            consent_flags: {
+              processing_consent: true,
+              confidentiality_acknowledged: true,
+            },
+          },
+          canRetry: webhookStatus === 500,
+        }
+
+        // Email: intake received
+        const newEmail: EmailMessage = {
+          id: 'email-' + Date.now(),
+          recipient: order.clientEmail,
+          subject: `We have your documents, work has started: ${order.orderNumber}`,
+          trigger: 'Intake submitted',
+          sentAt: getDemoNowISO(),
+          previewText: `Your intake documents for ${order.serviceName} have been received. Writer ${order.writerName} has commenced work.`,
+          primaryButtonText: 'View your order',
+          primaryButtonUrl: `/portal/orders/${order.id}`,
+          isRead: false,
+          plainText: `Intake submitted for ${order.orderNumber}. Order is now In Production.`,
+          htmlBody: `<h2>Intake received</h2><p>Work has started on ${order.serviceName}.</p>`,
+        }
+
+        // Notification
+        const notif: NotificationItem = {
+          id: 'notif-' + Date.now(),
+          clientEmail: order.clientEmail,
+          title: `Intake received: ${order.orderNumber}`,
+          description: `Order moved to In Production. Assigned writer: ${order.writerName}.`,
+          timestamp: getDemoNowISO(),
+          unread: true,
+          orderId: order.id,
+          linkUrl: `/portal/orders/${order.id}`,
+        }
+
+        set((state) => ({
+          orders: updatedOrders,
+          webhooks: [webhookLog, ...state.webhooks],
+          emails: [newEmail, ...state.emails],
+          notifications: [notif, ...state.notifications],
+        }))
+
+        get().markSuggestedStep('submitIntake')
+        eventBus.emit('intake.submitted', { orderId, formId })
+
+        get().addToast({
+          type: 'success',
+          title: 'Intake received',
+          message: `Order ${order.orderNumber} is now In Production.`,
+        })
+      },
+
+      requestRevisions: (orderId, comment) => {
+        const order = get().orders.find((o) => o.id === orderId)
+        if (!order) return
+
+        const updatedOrders = get().orders.map((o) => {
+          if (o.id !== orderId) return o
+          return {
+            ...o,
+            status: 'revisions-requested' as CustomOrderStatus,
+            revisionCount: o.revisionCount + 1,
+            revisionComments: [...(o.revisionComments || []), comment],
+            updatedAt: getDemoNowISO(),
+          }
+        })
+
+        // Webhook
+        const webhookStatus = get().scenarios.receiverFailure500 ? 500 : 200
+        const webhookLog: WebhookLogEntry = {
+          id: 'wh-' + Date.now(),
+          endpoint: '/hooks/order-status-changed',
+          event: 'order.status_changed',
+          status: webhookStatus,
+          durationMs: 152,
+          timestamp: getDemoNowISO(),
+          headers: {
+            'content-type': 'application/json',
+            'user-agent': 'WooCommerce/9.2.0 Webhook Hookshot',
+          },
+          payload: {
+            event: 'order.status_changed',
+            order_id: parseInt(order.orderNumber.replace(/\D/g, '')),
+            number: order.orderNumber,
+            from_status: order.status,
+            to_status: 'revisions-requested',
+            changed_by: `client:${order.clientEmail}`,
+            client_comment: comment,
+          },
+          canRetry: webhookStatus === 500,
+        }
+
+        // Email
+        const newEmail: EmailMessage = {
+          id: 'email-' + Date.now(),
+          recipient: order.clientEmail,
+          subject: `We have your revision request: ${order.orderNumber}`,
+          trigger: 'Revisions requested',
+          sentAt: getDemoNowISO(),
+          previewText: `Your comments for ${order.serviceName} have been assigned to ${order.writerName}.`,
+          primaryButtonText: 'View your order',
+          primaryButtonUrl: `/portal/orders/${order.id}`,
+          isRead: false,
+          plainText: `Revision request logged for ${order.orderNumber}.\nComment: "${comment}"`,
+          htmlBody: `<h2>Revision request received</h2><p>Writer ${order.writerName} is updating the draft.</p>`,
+        }
+
+        set((state) => ({
+          orders: updatedOrders,
+          webhooks: [webhookLog, ...state.webhooks],
+          emails: [newEmail, ...state.emails],
+        }))
+
+        get().addToast({
+          type: 'success',
+          title: 'Revisions requested',
+          message: `${order.writerName} has been notified and will address your feedback.`,
+        })
+      },
+
+      approveDraft: (orderId) => {
+        get().updateOrderStatus(orderId, 'delivered', {
+          changedBy: 'client:approved-draft',
+        })
+      },
+
+      uploadDocument: (doc) => {
+        const newDoc: DocumentItem = {
+          id: 'doc-' + Date.now(),
+          name: doc.name || 'Uploaded-Document.pdf',
+          sizeFormatted: doc.sizeFormatted || '1.2 MB',
+          sizeBytes: doc.sizeBytes || 1200000,
+          fileType: (doc.fileType as any) || 'PDF',
+          source: 'client',
+          uploadedAt: getDemoNowISO(),
+          category: (doc.category as any) || 'client-upload',
+          orderId: doc.orderId,
+          orderNumber: doc.orderNumber,
+        }
+
+        set((state) => ({
+          documents: [newDoc, ...state.documents],
+        }))
+
+        get().addToast({
+          type: 'success',
+          title: 'Document uploaded',
+          message: `${newDoc.name} is saved privately in your vault.`,
+        })
+      },
+
+      sendMessage: (orderId, text) => {
+        const order = get().orders.find((o) => o.id === orderId)
+        const user = get().currentUser
+
+        const newMsg: MessageItem = {
+          id: 'msg-' + Date.now(),
+          orderId,
+          senderRole: (user?.role as any) || 'client',
+          senderName: user?.name || 'Client',
+          senderInitials: user?.name
+            ? user.name
+                .split(' ')
+                .map((n) => n[0])
+                .join('')
+            : 'CL',
+          text,
+          timestamp: getDemoNowISO(),
+        }
+
+        set((state) => ({ messages: [...state.messages, newMsg] }))
+
+        // Automatic mock reply after 2s per PRD
+        setTimeout(() => {
+          const replyMsg: MessageItem = {
+            id: 'msg-reply-' + Date.now(),
+            orderId,
+            senderRole: 'writer',
+            senderName: order?.writerName || 'Lorato Dube',
+            senderInitials: order?.writerInitials || 'LD',
+            text: 'Thanks, noted. Back to you by end of day.',
+            timestamp: getDemoNowISO(),
+          }
+          set((state) => ({ messages: [...state.messages, replyMsg] }))
+        }, 2000)
+      },
+
+      markNotificationRead: (id) =>
+        set((state) => ({
+          notifications: state.notifications.map((n) =>
+            n.id === id ? { ...n, unread: false } : n
+          ),
         })),
-        linkedOrders: [],
-        deliveries: [],
-      };
 
-      set((state) => ({
-        orders: [newOrder, ...state.orders],
-        quotations: state.quotations.map((item) =>
-          item.id === quotationId ? { ...item, status: 'Won' } : item
-        ),
-      }));
+      markAllNotificationsRead: () =>
+        set((state) => ({
+          notifications: state.notifications.map((n) => ({ ...n, unread: false })),
+        })),
 
-      get().addToast(`Quotation converted to Customer PO ${newPoId}`, 'success');
-      saveState(get());
-      return newPoId;
-    },
+      markEmailRead: (id) =>
+        set((state) => ({
+          emails: state.emails.map((e) => (e.id === id ? { ...e, isRead: true } : e)),
+        })),
 
-    runSampleMigration: async () => {
-      set((state) => ({
-        migrationState: { ...state.migrationState, isRunning: true },
-      }));
+      retryWebhook: (id) => {
+        set((state) => ({
+          webhooks: state.webhooks.map((w) =>
+            w.id === id ? { ...w, status: 200, canRetry: false, durationMs: 135 } : w
+          ),
+        }))
+        get().addToast({
+          type: 'success',
+          title: 'Webhook redelivered',
+          message: 'Receiver responded with 200 OK.',
+        })
+      },
 
-      // Simulate 5 steps progress over 3 seconds
-      await new Promise((r) => setTimeout(r, 600));
-      set((state) => ({
-        migrationState: { ...state.migrationState, inventory: 18420, normalized: 15100 },
-      }));
+      fastForward24h: () => {
+        advanceDemoTimeHours(24)
+        const nowIso = getDemoNowISO()
 
-      await new Promise((r) => setTimeout(r, 600));
-      set((state) => ({
-        migrationState: { ...state.migrationState, normalized: 18420, deduped: 4812 },
-      }));
+        // Check if TV-2026-0148 is still in awaiting-intake; if so, trigger 24h reminder email!
+        const order148 = get().orders.find(
+          (o) => o.orderNumber === 'TV-2026-0148' && o.status === 'awaiting-intake'
+        )
 
-      await new Promise((r) => setTimeout(r, 600));
-      set((state) => ({
-        migrationState: { ...state.migrationState, relinked: 2940 },
-      }));
+        if (order148) {
+          const reminderEmail: EmailMessage = {
+            id: 'email-remind-' + Date.now(),
+            recipient: order148.clientEmail,
+            subject: `We are waiting on your intake for ${order148.orderNumber}`,
+            trigger: '24 h with no intake',
+            sentAt: nowIso,
+            previewText: `Friendly reminder: writer Kabo Ntshole cannot begin your Company Profile until intake documents are uploaded.`,
+            primaryButtonText: 'Complete your intake',
+            primaryButtonUrl: `/portal/intake/A?orderId=${order148.id}`,
+            isRead: false,
+            plainText: `We are waiting on your intake for ${order148.orderNumber}. Complete now: https://tendervantage.example/portal/intake/A?orderId=${order148.id}`,
+            htmlBody: `<h2>Reminder: Intake pending</h2><p>Please complete your intake for ${order148.orderNumber}.</p>`,
+          }
 
-      await new Promise((r) => setTimeout(r, 600));
-      set((state) => ({
-        migrationState: {
-          ...state.migrationState,
-          validated: 98.4,
-          isRunning: false,
-          lastSummary: 'Scan complete: 4,812 parts consolidated from 6,903 raw rows · 1,214 duplicates resolved · 98.4% of invoices linked',
-        },
-      }));
+          set((state) => ({ emails: [reminderEmail, ...state.emails] }))
 
-      get().addToast('Sample migration pipeline run completed successfully', 'success');
-      saveState(get());
-    },
+          get().addToast({
+            type: 'info',
+            title: 'Time advanced 24 hours',
+            message: `Automated intake reminder email dispatched for ${order148.orderNumber}.`,
+            actionLabel: 'View email',
+            actionUrl: '#inbox',
+          })
+        } else {
+          get().addToast({
+            type: 'info',
+            title: 'Time advanced 24 hours',
+            message: 'Clock moved forward by 24h.',
+          })
+        }
+      },
 
-    cyclePermission: (role, module) => {
-      const cycle: Array<'None' | 'View' | 'Edit' | 'Approve'> = ['None', 'View', 'Edit', 'Approve'];
-      set((state) => {
-        const current = state.permissionMatrix[role]?.[module] || 'None';
-        const nextIdx = (cycle.indexOf(current) + 1) % cycle.length;
-        const nextVal = cycle[nextIdx];
-
-        const nextMatrix = {
-          ...state.permissionMatrix,
-          [role]: {
-            ...state.permissionMatrix[role],
-            [module]: nextVal,
+      resetDemoData: () => {
+        resetDemoClock()
+        set({
+          currentUser: DEMO_ACCOUNTS[0],
+          cart: [],
+          couponCode: null,
+          discountPercent: 0,
+          orders: SEED_ORDERS,
+          documents: SEED_DOCUMENTS,
+          messages: SEED_MESSAGES,
+          notifications: SEED_NOTIFICATIONS,
+          emails: SEED_EMAILS,
+          webhooks: SEED_WEBHOOKS,
+          scenarios: INITIAL_SCENARIOS,
+          suggestedSteps: {
+            browseStore: false,
+            payCheckout: false,
+            submitIntake: false,
+            staffAdvance: false,
+            inspectWebhooks: false,
           },
-        };
-
-        return { permissionMatrix: nextMatrix };
-      });
-      get().addToast(`Updated ${role} → ${module} permission`, 'info');
-      saveState(get());
-    },
-
-    resetDemoData: () => {
-      localStorage.removeItem(STORAGE_KEY);
-      set({
-        currentEntity: 'peru',
-        currentRole: 'Sales',
-        language: 'EN',
-        clearedAttentionCount: 0,
-        parts: SEED_PARTS,
-        commercialEvents: SEED_COMMERCIAL_EVENTS,
-        quotations: SEED_QUOTATIONS,
-        orders: SEED_ORDERS,
-        invoices: SEED_INVOICES,
-        documents: SEED_DOCUMENTS,
-        duplicatePairs: SEED_DUPLICATE_PAIRS,
-        driveRelinks: SEED_DRIVE_RELINKS,
-        attentionItems: SEED_ATTENTION_ITEMS,
-        notifications: SEED_NOTIFICATIONS,
-        permissionMatrix: DEFAULT_PERMISSION_MATRIX,
-      });
-      get().addToast('Demo database restored to default seed', 'info');
-    },
-  };
-});
+        })
+        get().addToast({
+          type: 'success',
+          title: 'Demo data reset',
+          message: 'All seed orders, documents, and logs have been restored.',
+        })
+      },
+    }),
+    {
+      name: 'tv_demo_v1',
+    }
+  )
+)
