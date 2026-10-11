@@ -1,42 +1,82 @@
-/**
- * Formats a monetary value in Botswana Pula (BWP)
- * Example:
- *  formatBWP(12500) -> "P12,500"
- *  formatBWP(12500, { withDecimals: true }) -> "P12,500.00"
- */
-export function formatBWP(amount: number, options?: { withDecimals?: boolean }): string {
-  const withDecimals = options?.withDecimals ?? false
-  const formattedNumber = new Intl.NumberFormat('en-BW', {
-    minimumFractionDigits: withDecimals ? 2 : 0,
-    maximumFractionDigits: withDecimals ? 2 : 0,
-  }).format(amount)
+export function formatCurrency(
+  value: number,
+  options?: { showSign?: boolean; maximumFractionDigits?: number }
+): string {
+  const digits = options?.maximumFractionDigits ?? 2;
+  const absFormatted = Math.abs(value).toLocaleString('en-US', {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  });
 
-  return `P${formattedNumber}`
+  if (options?.showSign) {
+    if (value > 0) return `+$${absFormatted}`;
+    if (value < 0) return `-$${absFormatted}`;
+  }
+
+  return `$${absFormatted}`;
 }
 
-export function calculateVAT(amount: number, rate = 0.14): { subtotal: number; vat: number; total: number } {
-  const subtotal = amount
-  const vat = Math.round(subtotal * rate * 100) / 100
-  const total = subtotal + vat
-  return { subtotal, vat, total }
+export function formatAddress(address: string, startChars: number = 6, endChars: number = 4): string {
+  if (!address || address.length < startChars + endChars) return address || '';
+  return `${address.slice(0, startChars)}…${address.slice(-endChars)}`;
 }
 
-export function formatDate(dateString: string | Date): string {
-  const date = typeof dateString === 'string' ? new Date(dateString) : dateString
-  return new Intl.DateTimeFormat('en-GB', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  }).format(date)
+export function formatTxHash(hash: string): string {
+  if (!hash || hash.length < 12) return hash || '';
+  return `${hash.slice(0, 6)}…${hash.slice(-4)}`;
 }
 
-export function formatDateTime(dateString: string | Date): string {
-  const date = typeof dateString === 'string' ? new Date(dateString) : dateString
-  return new Intl.DateTimeFormat('en-GB', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(date)
+export function getTimeRemaining(targetIso: string): {
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+  totalSeconds: number;
+  formatted: string;
+} {
+  const diff = Math.max(0, new Date(targetIso).getTime() - Date.now());
+  const totalSeconds = Math.floor(diff / 1000);
+
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  const pad = (n: number) => n.toString().padStart(2, '0');
+
+  let formatted = '';
+  if (days > 0) {
+    formatted = `${days}d ${pad(hours)}h ${pad(minutes)}m`;
+  } else {
+    formatted = `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+  }
+
+  return { days, hours, minutes, seconds, totalSeconds, formatted };
+}
+
+export function calculateModuloWinner(randomWordStr: string, entriesCount: number) {
+  try {
+    const bigRandom = BigInt(randomWordStr);
+    const bigEntries = BigInt(entriesCount > 0 ? entriesCount : 1);
+    const remainder = Number(bigRandom % bigEntries);
+    const winningEntryNumber = remainder + 1; // 1-indexed entry number
+
+    return {
+      success: true,
+      winningEntryNumber,
+      remainder,
+      steps: [
+        `Step 1: Read verified 256-bit random word from Chainlink VRF: ${randomWordStr.slice(0, 16)}...`,
+        `Step 2: Calculate modulo with total sealed entries count (${entriesCount}): ${bigRandom.toString().slice(0, 12)}... mod ${entriesCount}`,
+        `Step 3: Remainder is ${remainder}. Adding 1 yields Winning Entry #${winningEntryNumber}.`
+      ]
+    };
+  } catch {
+    return {
+      success: false,
+      winningEntryNumber: 1,
+      remainder: 0,
+      steps: ['Invalid number input format']
+    };
+  }
 }

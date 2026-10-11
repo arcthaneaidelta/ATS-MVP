@@ -1,100 +1,61 @@
-import React from 'react'
-import { cn } from '@/lib/cn'
-import { AlertCircle } from 'lucide-react'
+import React from 'react';
+import { AlertCircle, Check } from 'lucide-react';
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label?: string
-  error?: string
-  hint?: string
-  isRequired?: boolean
-  leftIcon?: React.ReactNode
-  rightIcon?: React.ReactNode
+  label?: string;
+  error?: string;
+  helperText?: string;
+  prefixText?: string;
+  isSuccess?: boolean;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  (
-    {
-      className,
-      label,
-      error,
-      hint,
-      isRequired,
-      leftIcon,
-      rightIcon,
-      id,
-      ...props
-    },
-    ref
-  ) => {
-    const inputId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined)
+  ({ label, error, helperText, prefixText, isSuccess, className = '', id, ...props }, ref) => {
+    const inputId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined);
 
     return (
-      <div className="w-full flex flex-col gap-1.5">
+      <div className="w-full flex flex-col gap-1.5 text-left">
         {label && (
-          <div className="flex items-center justify-between">
-            <label
-              htmlFor={inputId}
-              className="text-sm font-semibold text-[#17323A] flex items-center gap-1.5"
-            >
-              <span>{label}</span>
-              {isRequired && (
-                <span className="text-[11px] font-medium uppercase tracking-wider text-[#8A5F2B]">
-                  Required
-                </span>
-              )}
-            </label>
-          </div>
+          <label htmlFor={inputId} className="text-xs font-semibold uppercase tracking-wider text-[#4A5650]">
+            {label}
+          </label>
         )}
-
         <div className="relative flex items-center">
-          {leftIcon && (
-            <div className="absolute left-3.5 text-[#6F7A78] pointer-events-none flex items-center">
-              {leftIcon}
-            </div>
+          {prefixText && (
+            <span className="absolute left-3.5 text-sm font-mono text-[#7C867F] select-none pointer-events-none">
+              {prefixText}
+            </span>
           )}
-
           <input
-            ref={ref}
             id={inputId}
-            aria-invalid={Boolean(error)}
-            aria-describedby={error ? `${inputId}-error` : hint ? `${inputId}-hint` : undefined}
-            className={cn(
-              'w-full h-12 rounded-[8px] bg-white border px-3.5 text-base text-[#1B2625] placeholder:text-[#6F7A78] transition-all duration-[140ms]',
-              'focus:border-[#17323A] focus:outline-none focus:ring-2 focus:ring-[#3F6C8C]/35',
-              error
-                ? 'border-[#A94438] focus:border-[#A94438] focus:ring-[#A94438]/20'
-                : 'border-[#CFC7B6] hover:border-[#17323A]/60',
-              leftIcon && 'pl-10',
-              rightIcon && 'pr-10',
-              className
-            )}
+            ref={ref}
+            className={`w-full h-11 px-3.5 ${prefixText ? 'pl-8' : ''} ${
+              error ? 'border-[#A8453A] focus:border-[#A8453A] focus:ring-[#A8453A]/20' : 'border-[#DDD8CD] focus:border-[#2C4A3E] focus:ring-[#E3EBE6]'
+            } bg-[#EDE9E1] text-[#1B2420] text-sm rounded-md border transition-colors duration-150 placeholder:text-[#7C867F] focus:outline-none focus:ring-2 disabled:opacity-50 disabled:bg-[#DDD8CD]/40 ${className}`}
             {...props}
           />
-
-          {rightIcon && (
-            <div className="absolute right-3.5 text-[#6F7A78] pointer-events-none flex items-center">
-              {rightIcon}
-            </div>
+          {error && (
+            <span className="absolute right-3.5 text-[#A8453A] pointer-events-none">
+              <AlertCircle className="w-4 h-4" />
+            </span>
+          )}
+          {isSuccess && !error && (
+            <span className="absolute right-3.5 text-[#3E7D5A] pointer-events-none">
+              <Check className="w-4 h-4" />
+            </span>
           )}
         </div>
-
-        {error ? (
-          <p
-            id={`${inputId}-error`}
-            role="alert"
-            className="text-xs text-[#A94438] flex items-center gap-1 font-medium mt-0.5"
-          >
-            <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-            <span>{error}</span>
+        {error && (
+          <p className="text-xs text-[#A8453A] flex items-center gap-1 font-medium mt-0.5">
+            {error}
           </p>
-        ) : hint ? (
-          <p id={`${inputId}-hint`} className="text-xs text-[#6F7A78] mt-0.5">
-            {hint}
-          </p>
-        ) : null}
+        )}
+        {helperText && !error && (
+          <p className="text-xs text-[#7C867F] mt-0.5">{helperText}</p>
+        )}
       </div>
-    )
+    );
   }
-)
+);
 
-Input.displayName = 'Input'
+Input.displayName = 'Input';
