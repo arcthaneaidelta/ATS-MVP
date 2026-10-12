@@ -1,14 +1,17 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
+import { cn } from '../../lib/utils';
+import { modalVariants } from '../../lib/motion';
 
-export interface ModalProps {
+interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   title?: React.ReactNode;
   description?: React.ReactNode;
   children: React.ReactNode;
   maxWidth?: 'sm' | 'md' | 'lg' | 'xl';
-  preventClose?: boolean;
+  showCloseButton?: boolean;
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -18,79 +21,83 @@ export const Modal: React.FC<ModalProps> = ({
   description,
   children,
   maxWidth = 'md',
-  preventClose = false,
+  showCloseButton = true,
 }) => {
-  const modalRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !preventClose) {
-        onClose();
-      }
+      if (e.key === 'Escape' && isOpen) onClose();
     };
-
     if (isOpen) {
       document.body.style.overflow = 'hidden';
       window.addEventListener('keydown', handleKeyDown);
     }
-
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = '';
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isOpen, onClose, preventClose]);
+  }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
-
-  const maxWidthStyles = {
+  const widths = {
     sm: 'max-w-md',
-    md: 'max-w-lg', // ~480-512px
-    lg: 'max-w-xl', // ~560px
-    xl: 'max-w-2xl',
+    md: 'max-w-lg',
+    lg: 'max-w-2xl',
+    xl: 'max-w-4xl',
   };
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      className="fixed inset-0 z-[70] flex items-center justify-center p-4 sm:p-6"
-    >
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-[#1B2420]/45 backdrop-blur-[2px] transition-opacity duration-200"
-        onClick={() => !preventClose && onClose()}
-      />
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-modal flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18 }}
+            onClick={onClose}
+            className="fixed inset-0 bg-[#141A17]/55 backdrop-blur-[2px]"
+          />
 
-      {/* Modal Dialog Content */}
-      <div
-        ref={modalRef}
-        className={`relative w-full ${maxWidthStyles[maxWidth]} bg-[#FFFFFF] border border-[#DDD8CD] rounded-lg shadow-[0_20px_48px_rgba(27,36,32,0.14)] z-10 overflow-hidden transform transition-all duration-200 animate-in fade-in zoom-in-95`}
-      >
-        {(title || !preventClose) && (
-          <div className="flex items-start justify-between p-6 pb-4 border-b border-[#DDD8CD]/60 bg-[#FBF9F5]">
-            <div>
-              {title && (
-                <h3 className="text-xl font-display font-medium text-[#1B2420]">{title}</h3>
-              )}
-              {description && (
-                <p className="text-sm text-[#4A5650] mt-1">{description}</p>
-              )}
-            </div>
-            {!preventClose && (
-              <button
-                type="button"
-                onClick={onClose}
-                className="text-[#7C867F] hover:text-[#1B2420] p-1.5 rounded-md hover:bg-[#EDE9E1] transition-colors cursor-pointer"
-                aria-label="Close"
-              >
-                <X className="w-5 h-5" />
-              </button>
+          {/* Modal Container */}
+          <motion.div
+            variants={modalVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className={cn(
+              'relative w-full bg-surface rounded-lg shadow-sh-3 border border-border overflow-hidden z-10 my-auto text-left',
+              widths[maxWidth]
             )}
-          </div>
-        )}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {(title || showCloseButton) && (
+              <div className="flex items-start justify-between px-6 pt-6 pb-4 border-b border-border/60">
+                <div>
+                  {title && (
+                    <h3 className="font-serif text-xl sm:text-2xl font-normal text-ink leading-snug">
+                      {title}
+                    </h3>
+                  )}
+                  {description && (
+                    <p className="text-sm text-ink-2 mt-1">{description}</p>
+                  )}
+                </div>
+                {showCloseButton && (
+                  <button
+                    onClick={onClose}
+                    className="p-1.5 -mr-1.5 -mt-1 rounded-md text-ink-3 hover:text-ink hover:bg-sand-soft transition-colors"
+                    aria-label="Close dialog"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                )}
+              </div>
+            )}
 
-        <div className="p-6">{children}</div>
-      </div>
-    </div>
+            <div className="p-6">{children}</div>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
   );
 };

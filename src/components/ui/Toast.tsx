@@ -1,15 +1,19 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { CheckCircle2, AlertTriangle, AlertCircle, Info, X } from 'lucide-react';
+import { cn } from '../../lib/utils';
 
-export interface ToastItem {
+export type ToastType = 'success' | 'warning' | 'error' | 'info';
+
+interface ToastItem {
   id: string;
-  type: 'success' | 'error' | 'info' | 'warning';
-  title?: string;
-  message: string;
+  type: ToastType;
+  title: string;
+  message?: string;
 }
 
 interface ToastContextType {
-  toast: (options: { type?: 'success' | 'error' | 'info' | 'warning'; title?: string; message: string }) => void;
+  toast: (opts: { type?: ToastType; title: string; message?: string }) => void;
 }
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
@@ -17,72 +21,70 @@ const ToastContext = createContext<ToastContextType | undefined>(undefined);
 export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
 
-  const removeToast = useCallback((id: string) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
+  const toast = useCallback(({ type = 'info', title, message }: { type?: ToastType; title: string; message?: string }) => {
+    const id = `toast-${Date.now()}-${Math.random()}`;
+    setToasts((prev) => [...prev, { id, type, title, message }]);
+
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 4000);
   }, []);
 
-  const toast = useCallback(
-    ({ type = 'info', title, message }: { type?: 'success' | 'error' | 'info' | 'warning'; title?: string; message: string }) => {
-      const id = `toast_${Date.now()}_${Math.random().toString(16).slice(2, 6)}`;
-      setToasts((prev) => [...prev.slice(-2), { id, type, title, message }]);
+  const dismiss = (id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  };
 
-      setTimeout(() => {
-        removeToast(id);
-      }, 4000);
-    },
-    [removeToast]
-  );
+  const icons: Record<ToastType, React.ReactNode> = {
+    success: <CheckCircle2 className="w-5 h-5 text-success" />,
+    warning: <AlertTriangle className="w-5 h-5 text-warning" />,
+    error: <AlertCircle className="w-5 h-5 text-error" />,
+    info: <Info className="w-5 h-5 text-info" />,
+  };
 
   return (
     <ToastContext.Provider value={{ toast }}>
       {children}
-      {/* Toast container: top on mobile, bottom-right on desktop */}
-      <div
-        aria-live="polite"
-        className="fixed z-[80] top-4 sm:top-auto sm:bottom-6 right-4 sm:right-6 flex flex-col gap-2 max-w-sm w-[calc(100vw-32px)] sm:w-auto pointer-events-none"
-      >
-        {toasts.map((t) => {
-          const icons = {
-            success: <CheckCircle2 className="w-5 h-5 text-[#3E7D5A] shrink-0" />,
-            error: <AlertCircle className="w-5 h-5 text-[#A8453A] shrink-0" />,
-            warning: <AlertCircle className="w-5 h-5 text-[#B7791F] shrink-0" />,
-            info: <Info className="w-5 h-5 text-[#3F6B8A] shrink-0" />,
-          };
-
-          return (
-            <div
+      <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-toast flex flex-col gap-2.5 max-w-sm w-full pointer-events-none px-4 sm:px-0">
+        <AnimatePresence>
+          {toasts.map((t) => (
+            <motion.div
               key={t.id}
-              className="pointer-events-auto bg-[#FFFFFF] border border-[#DDD8CD] shadow-[0_6px_20px_rgba(27,36,32,0.08)] rounded-md p-3.5 flex items-start gap-3 transform transition-all duration-200 animate-in fade-in slide-in-from-bottom-2"
+              initial={{ opacity: 0, y: 16, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.15 } }}
+              transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+              className={cn(
+                'pointer-events-auto flex items-start gap-3 p-4 bg-surface rounded-lg shadow-sh-3 border border-border text-left',
+                t.type === 'error' && 'border-error/30',
+                t.type === 'success' && 'border-success/30'
+              )}
             >
-              {icons[t.type]}
-              <div className="flex-1 min-w-0 pr-2">
-                {t.title && (
-                  <h4 className="text-xs font-semibold text-[#1B2420] tracking-wide uppercase mb-0.5">
-                    {t.title}
-                  </h4>
-                )}
-                <p className="text-xs text-[#4A5650] leading-relaxed">{t.message}</p>
+              <div className="shrink-0 mt-0.5">{icons[t.type]}</div>
+              <div className="flex-1 min-w-0 pr-1">
+                <h5 className="text-sm font-semibold text-ink leading-tight">{t.title}</h5>
+                {t.message && <p className="text-xs text-ink-2 mt-1 leading-normal">{t.message}</p>}
               </div>
               <button
-                type="button"
-                onClick={() => removeToast(t.id)}
-                className="text-[#7C867F] hover:text-[#1B2420] p-1 rounded hover:bg-[#EDE9E1] transition-colors cursor-pointer"
-                aria-label="Close notification"
+                onClick={() => dismiss(t.id)}
+                className="p-1 -mr-1 -mt-1 text-ink-3 hover:text-ink transition-colors rounded"
+                aria-label="Dismiss"
               >
-                <X className="w-3.5 h-3.5" />
+                <X className="w-4 h-4" />
               </button>
-            </div>
-          );
-        })}
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
     </ToastContext.Provider>
   );
 };
 
-export const useToast = () => {
-  const context = useContext(ToastContext);
-  if (!context) {
-    throw new Error('useToast must be used within a ToastProvider');
+export function useToast() {
+  const ctx = useContext(ToastContext);
+  if (!ctx) {
+    return {
+      toast: () => {},
+    };
   }
-  return context;
-};
+  return ctx;
+}

@@ -1,69 +1,65 @@
-# Meridian — Provably Fair Pools on Base
+# Future Shuttles & Rentals — High-Fidelity Interactive Demo
 
-> High-fidelity interactive prototype for a custodial, Web2-feeling pooling platform powered by Base L2 smart contracts and Chainlink VRF.
-
-[![Deploys on Netlify](https://img.shields.io/badge/Deploy-Netlify-00C7B7?logo=netlify&logoColor=white)](https://www.netlify.com/)
-[![Built with Vite](https://img.shields.io/badge/Built%20with-Vite%20%2B%20React%2019-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
-[![Settled on Base](https://img.shields.io/badge/Settlement-Base%20L2-0052FF?logo=coinbase&logoColor=white)](https://base.org)
-[![Chainlink VRF](https://img.shields.io/badge/Fairness-Chainlink%20VRF-375BD2?logo=chainlink&logoColor=white)](https://chain.link/vrf)
+> **Namibia Self-Drive 4x4 & Vehicle Rental Web Platform**  
+> A frontend-only, production-grade interactive prototype featuring dynamic tiered duration pricing, real-time availability & concurrency conflict engines, 4-step instant checkout with simulated DPO card payments, quotation pipeline, and an administrative fleet management portal.
 
 ---
 
-## 🏛️ Executive Overview
+## 🌟 Key Features
 
-Meridian addresses the core friction of Web3 prize pools: non-crypto consumers are intimidated by seed phrases, browser extensions, gas estimation, and network switching.
-
-Meridian delivers **consumer banking simplicity on the surface, cryptographic trust underneath**:
-- **Zero Wallets Required**: Users authenticate via email or SSO; balances are displayed in plain dollars.
-- **Dedicated Sub-Wallets**: Each user receives a unique CREATE2 sub-wallet deposit address on Base. Deposits are automatically detected, swept, and credited.
-- **Fixed-Contribution Pools**: Daily ($5), Weekly ($25), and Monthly ($100) pools with transparent platform fees (5%) and auditable prize pots.
-- **Tamper-Proof Draws**: Automatic winner derivation using Chainlink VRF v2.5 verified on-chain via elliptic curve math and modulo arithmetic (`winner = randomWord % entries`).
-- **Automated Payout Routing**: Winnings are auto-dispatched to pre-saved withdrawal destinations with a 24-hour security cooling-off lock.
-- **Institutional Trust Center**: Interactive 5-layer security diagram (HSM/KMS key isolation, OpenZeppelin contracts) and an edge rate-limiting token-bucket simulator.
-
----
-
-## 🚀 Netlify Deployment
-
-This repository includes pre-configured [`netlify.toml`](./netlify.toml) and [`public/_redirects`](./public/_redirects) for instant zero-configuration deployment on Netlify.
-
-### Build Settings
-- **Build Command**: `npm run build`
-- **Publish Directory**: `dist`
-- **Node Version**: 18+ / 20+
-
-### Automatic SPA Routing
-All routes (e.g. `/app`, `/verify`, `/trust`, `/app/pools/pool_w_41`) are automatically rewritten to `/index.html` with status `200` to support React Router v6 browser history.
+- **Editorial Desert-Warm Design**: Custom visual tokens inspired by Namibian dunes and acacia landscapes (`#F6F2EB`, `#23302B`, `#B5683A`). Editorial typography with *Fraunces* serif headlines and *Inter* UI text with tabular numeric formatting (`font-variant-numeric: tabular-nums`).
+- **Automatic Duration-Based Pricing Engine**: Pure, deterministic tiered rate calculations stepping down daily rates at 3, 8, and 21+ days. Tested across all bracket edges.
+- **Three Distinct Money Lines**:
+  1. *Total Due Now (Charged)*: Immediate full payment for instant online bookings.
+  2. *Booking Deposit (Quotes)*: 20% required deposit for custom quotes.
+  3. *Refundable Security Deposit (Hold)*: Card pre-authorisation hold taken at vehicle handover in Windhoek (never charged today).
+- **Concurrency & Overlap Prevention (AC 8)**: Prevents simultaneous double-bookings at checkout with instant detection, alternative vehicle suggestions, and audit logging.
+- **Dual Booking Pathways**:
+  - *Option A — Instant Booking*: 4-step stepper, 10-minute hold timer, simulated DPO card sheet with demo controls (success, declined, conflict), calendar `.ics` download, print receipt support.
+  - *Option B — Quotations*: Inbound quote request with multi-vehicle preference chips; tokenised customer proposal page (`/quote/:ref`) with online deposit payment.
+- **Full Admin Backend (`/admin`)**:
+  - *Timeline Calendar (Hero Screen)*: 30-day visual timeline across all vehicles. Colour-coded bars for online bookings, offline VIP bookings, and maintenance blocks. Click-to-block functionality.
+  - *Bookings Table*: Search, filter, inspect payment timelines (`Initiated → Authorised → Verified → Confirmed`), and toggle card hold states.
+  - *Quotations Kanban Pipeline*: Move quotes through stages, formulate custom discounts, verify real-time fleet availability, and issue proposals.
+  - *Live Rate Bracket Editor*: Per-vehicle tier editor with an interactive calculator panel and one-click fleet sync.
+- **Floating Demo Pill**: Instant 1-click toggle between Public Website and Admin Portal with demo data reset.
 
 ---
 
-## 💻 Local Development
+## 🚀 Quick Start (Local Development)
 
 ```bash
-# 1. Install dependencies
+# Install dependencies
 npm install
 
-# 2. Start Vite local dev server
+# Start Vite dev server
 npm run dev
 
-# 3. Build production bundle
+# Run engine unit tests
+npm test
+
+# Build for production
 npm run build
 ```
 
 ---
 
-## 🛠️ Tech Stack & Architecture
+## 🌐 Netlify Deployment
 
-- **Framework**: React 19 + TypeScript + Vite
-- **Routing**: React Router v6
-- **Styling**: Tailwind CSS + Custom Design System Tokens (`tokens.css`)
-- **State Management**: Zustand with persistent storage and seed data restoration
-- **Typography**: `Newsreader` (Editorial Display), `Inter` (UI/Body), `JetBrains Mono` (Addresses & Cryptographic Proofs)
-- **Icons**: Lucide React
-- **QR Codes**: `qrcode.react` (Sub-wallet deposit address)
+This repository is pre-configured for **1-click Netlify hosting**:
+
+1. **Build Command**: `npm run build`
+2. **Publish Directory**: `dist`
+3. **SPA Redirects**: Included via `netlify.toml` and `public/_redirects` to ensure clean client-side routing on all deep links (`/fleet`, `/book`, `/admin`, etc.).
 
 ---
 
-## 📜 License & Disclosures
+## 🛠️ Tech Stack
 
-*Interactive prototype demonstration.* Does not execute live on-chain mainnet transactions without configured contracts. All mathematical proofs and BigInt modulo operations operate truthfully on real simulated cryptographic seeds.
+- **Framework**: React 19 + TypeScript + Vite
+- **Styling**: Tailwind CSS + Custom CSS Variables Token System
+- **State Management**: Zustand with `localStorage` persistence
+- **Animations**: Framer Motion
+- **Icons**: Lucide React
+- **Date Arithmetic**: date-fns
+- **Unit Testing**: Node.js Native Test Runner via `tsx`

@@ -1,43 +1,52 @@
 import React from 'react';
+import { cn } from '../../lib/utils';
+import { CheckCircle2, Clock, AlertTriangle, XCircle, Info, ShieldCheck, Tag } from 'lucide-react';
 
-export interface StatusChipProps {
-  status?: 'success' | 'warning' | 'error' | 'info' | 'neutral';
+export type StatusVariant = 'success' | 'warning' | 'error' | 'info' | 'neutral' | 'accent';
+
+interface StatusChipProps {
   label: string;
-  isPulsing?: boolean;
+  variant?: StatusVariant;
+  icon?: React.ReactNode;
+  size?: 'sm' | 'md';
   className?: string;
 }
 
 export const StatusChip: React.FC<StatusChipProps> = ({
-  status = 'neutral',
   label,
-  isPulsing = false,
-  className = '',
+  variant = 'neutral',
+  icon,
+  size = 'md',
+  className
 }) => {
-  const styles = {
-    success: 'bg-[#3E7D5A]/10 text-[#3E7D5A] border-[#3E7D5A]/20',
-    warning: 'bg-[#B7791F]/10 text-[#B7791F] border-[#B7791F]/20',
-    error: 'bg-[#A8453A]/10 text-[#A8453A] border-[#A8453A]/20',
-    info: 'bg-[#3F6B8A]/10 text-[#3F6B8A] border-[#3F6B8A]/20',
-    neutral: 'bg-[#EDE9E1] text-[#4A5650] border-[#DDD8CD]',
+  const styles: Record<StatusVariant, string> = {
+    success: 'bg-success-soft text-success border-success/20',
+    warning: 'bg-warning-soft text-warning border-warning/20',
+    error: 'bg-error-soft text-error border-error/20',
+    info: 'bg-info-soft text-info border-info/20',
+    neutral: 'bg-sand-soft text-ink-2 border-border',
+    accent: 'bg-accent-soft text-accent border-accent/20',
   };
 
-  const dotColors = {
-    success: 'bg-[#3E7D5A]',
-    warning: 'bg-[#B7791F]',
-    error: 'bg-[#A8453A]',
-    info: 'bg-[#3F6B8A]',
-    neutral: 'bg-[#7C867F]',
+  const defaultIcons: Record<StatusVariant, React.ReactNode> = {
+    success: <CheckCircle2 className="w-3.5 h-3.5" />,
+    warning: <Clock className="w-3.5 h-3.5" />,
+    error: <XCircle className="w-3.5 h-3.5" />,
+    info: <Info className="w-3.5 h-3.5" />,
+    neutral: <Tag className="w-3.5 h-3.5" />,
+    accent: <ShieldCheck className="w-3.5 h-3.5" />,
   };
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-sm border text-xs font-medium tracking-wide ${styles[status]} ${className}`}
+      className={cn(
+        'inline-flex items-center gap-1.5 font-medium rounded-full border border-solid transition-colors select-none',
+        size === 'sm' ? 'text-[11px] px-2 py-0.5' : 'text-xs px-2.5 py-1',
+        styles[variant],
+        className
+      )}
     >
-      <span
-        className={`w-1.5 h-1.5 rounded-full ${dotColors[status]} ${
-          isPulsing ? 'animate-pulse' : ''
-        }`}
-      />
+      <span className="shrink-0">{icon !== undefined ? icon : defaultIcons[variant]}</span>
       <span>{label}</span>
     </span>
   );

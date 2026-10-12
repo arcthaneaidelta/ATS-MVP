@@ -1,67 +1,58 @@
 :root {
   /* color */
-  --bg: #F5F2EC;
-  --surface: #FBF9F5;
-  --surface-elevated: #FFFFFF;
-  --surface-sunken: #EDE9E1;
-  --ink: #1B2420;
-  --text-secondary: #4A5650;
-  --text-muted: #7C867F;
-  --border: #DDD8CD;
-  --border-strong: #C7C1B3;
-  --primary: #2C4A3E;
-  --primary-hover: #223A30;
-  --primary-active: #1A2D25;
-  --primary-soft: #E3EBE6;
-  --secondary: #6B7A72;
-  --accent: #B08A4E;
-  --accent-soft: #F1E7D3;
-  --success: #3E7D5A;
-  --warning: #B7791F;
-  --error: #A8453A;
-  --info: #3F6B8A;
-  --footer-bg: #16201C;
-
-  /* spacing */
-  --s-1: 4px;
-  --s-2: 8px;
-  --s-3: 12px;
-  --s-4: 16px;
-  --s-5: 24px;
-  --s-6: 32px;
-  --s-7: 48px;
-  --s-8: 64px;
-  --s-9: 96px;
-  --s-10: 128px;
+  --bg: #F6F2EB;
+  --surface: #FFFFFF;
+  --surface-elevated: #FBF8F3;
+  --surface-2: #FBF8F3;
+  --ink: #1D211E;
+  --ink-2: #555B55;
+  --ink-3: #8A8E86;
+  --border: #E3DDD1;
+  --border-strong: #CFC7B8;
+  --primary: #23302B;
+  --primary-hover: #2F403A;
+  --primary-active: #1A2420;
+  --accent: #B5683A;
+  --accent-hover: #9E5830;
+  --accent-soft: #F1E3D8;
+  --sand: #D9CDB8;
+  --sand-soft: #EDE6D8;
+  --success: #3E7A58;
+  --success-soft: #E3EFE8;
+  --warning: #A97A22;
+  --warning-soft: #F6EBD3;
+  --error: #A9453D;
+  --error-soft: #F5E2DF;
+  --info: #3F6785;
+  --info-soft: #E1EAF0;
 
   /* radius */
   --r-sm: 6px;
   --r-md: 10px;
-  --r-lg: 14px;
+  --r-lg: 16px;
+  --r-xl: 24px;
 
   /* shadow */
-  --sh-1: 0 1px 2px rgba(27, 36, 32, 0.05);
-  --sh-2: 0 6px 20px rgba(27, 36, 32, 0.08);
-  --sh-3: 0 20px 48px rgba(27, 36, 32, 0.14);
+  --sh-1: 0 1px 2px rgba(29, 33, 30, 0.06);
+  --sh-2: 0 6px 20px -8px rgba(29, 33, 30, 0.16);
+  --sh-3: 0 24px 60px -24px rgba(29, 33, 30, 0.28);
+
+  /* type */
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Inter', system-ui, sans-serif;
 
   /* motion */
   --d-fast: 140ms;
   --d-med: 260ms;
-  --d-slow: 520ms;
-  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
-  --ease-emph: cubic-bezier(0.76, 0, 0.24, 1);
+  --d-slow: 600ms;
+  --e-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --e-inout: cubic-bezier(0.76, 0, 0.24, 1);
+  --e-std: cubic-bezier(0.2, 0, 0, 1);
 
   /* z-index */
-  --z-nav: 40;
+  --z-header: 40;
   --z-drawer: 60;
   --z-modal: 70;
   --z-toast: 80;
-  --z-loader: 100;
-
-  /* typography */
-  --font-display: 'Newsreader', Georgia, serif;
-  --font-body: 'Inter', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --z-intro: 100;
 }

@@ -1,83 +1,73 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { cn } from '../../lib/utils';
 import { Loader2, Check } from 'lucide-react';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'accent';
+  variant?: 'primary' | 'secondary' | 'accent' | 'ghost' | 'outline' | 'destructive';
   size?: 'sm' | 'md' | 'lg' | 'icon';
-  isLoading?: boolean;
-  isSuccess?: boolean;
-  children?: React.ReactNode;
+  loading?: boolean;
+  success?: boolean;
+  icon?: React.ReactNode;
+  iconPosition?: 'left' | 'right';
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
+      className,
       variant = 'primary',
       size = 'md',
-      isLoading = false,
-      isSuccess = false,
+      loading = false,
+      success = false,
       disabled,
-      className = '',
       children,
-      onClick,
+      icon,
+      iconPosition = 'left',
+      type = 'button',
       ...props
     },
     ref
   ) => {
-    const [showSuccess, setShowSuccess] = useState(false);
+    const baseStyles = 'inline-flex items-center justify-center font-medium transition-all duration-150 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none select-none rounded-md outline-none';
 
-    // Trigger temporary success state if isSuccess is passed
-    React.useEffect(() => {
-      if (isSuccess) {
-        setShowSuccess(true);
-        const timer = setTimeout(() => setShowSuccess(false), 1200);
-        return () => clearTimeout(timer);
-      }
-    }, [isSuccess]);
-
-    const baseStyles =
-      'inline-flex items-center justify-center font-medium font-body transition-all duration-150 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 select-none active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100 cursor-pointer';
-
-    const sizeStyles = {
-      sm: 'text-xs px-3 py-1.5 h-8 gap-1.5',
-      md: 'text-sm px-4 py-2 h-10 gap-2',
-      lg: 'text-base px-6 py-3 h-12 gap-2.5',
-      icon: 'h-10 w-10 p-0 items-center justify-center',
+    const variants = {
+      primary: 'bg-primary text-white hover:bg-primary-hover active:bg-primary-active shadow-sm',
+      secondary: 'bg-sand-soft text-ink hover:bg-[#E6DDCB] active:bg-[#DFD4BF] border border-border',
+      accent: 'bg-accent text-white hover:bg-accent-hover active:bg-[#8D4D28] shadow-sm',
+      ghost: 'text-ink hover:bg-sand-soft/60 active:bg-sand-soft',
+      outline: 'border border-border text-ink hover:bg-sand-soft/50 active:bg-sand-soft',
+      destructive: 'bg-error text-white hover:bg-[#913A33] active:bg-[#7D322B] shadow-sm',
     };
 
-    const variantStyles = {
-      primary:
-        'bg-[#2C4A3E] text-[#FBF9F5] hover:bg-[#223A30] active:bg-[#1A2D25] focus-visible:ring-[#2C4A3E] border border-transparent shadow-none',
-      secondary:
-        'bg-transparent text-[#1B2420] border border-[#DDD8CD] hover:bg-[#EDE9E1] hover:border-[#C7C1B3] active:bg-[#DDD8CD] focus-visible:ring-[#2C4A3E]',
-      ghost:
-        'bg-transparent text-[#4A5650] hover:text-[#1B2420] hover:bg-[#EDE9E1] active:bg-[#DDD8CD] border-transparent focus-visible:ring-[#2C4A3E]',
-      danger:
-        'bg-[#A8453A] text-white hover:bg-[#8F3B32] active:bg-[#742F28] focus-visible:ring-[#A8453A]',
-      accent:
-        'bg-[#B08A4E] text-[#1B2420] hover:bg-[#9F7A3E] active:bg-[#8C692F] focus-visible:ring-[#B08A4E]',
+    const sizes = {
+      sm: 'text-xs px-3 py-1.5 h-8 gap-1.5',
+      md: 'text-sm px-4 py-2.5 h-10 gap-2',
+      lg: 'text-base px-6 py-3.5 h-12 gap-2.5 min-h-[48px]',
+      icon: 'h-10 w-10 p-0',
     };
 
     return (
       <button
         ref={ref}
-        disabled={disabled || isLoading}
-        onClick={onClick}
-        className={`${baseStyles} ${sizeStyles[size]} ${variantStyles[variant]} ${className}`}
+        type={type}
+        disabled={disabled || loading}
+        className={cn(baseStyles, variants[variant], sizes[size], className)}
         {...props}
       >
-        {isLoading ? (
-          <span className="flex items-center gap-2">
-            <Loader2 className="w-4 h-4 animate-spin text-current" />
-            <span>Processing...</span>
-          </span>
-        ) : showSuccess ? (
-          <span className="flex items-center gap-2 text-current">
-            <Check className="w-4 h-4" />
-            <span>Success</span>
-          </span>
+        {loading ? (
+          <Loader2 className="h-4 w-4 animate-spin text-current" />
+        ) : success ? (
+          <Check className="h-4 w-4 text-current animate-in zoom-in" />
         ) : (
-          children
+          <>
+            {icon && iconPosition === 'left' && <span className="shrink-0">{icon}</span>}
+            {children}
+            {icon && iconPosition === 'right' && (
+              <span className="shrink-0 transition-transform duration-150 group-hover:translate-x-0.5">
+                {icon}
+              </span>
+            )}
+          </>
         )}
       </button>
     );
