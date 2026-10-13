@@ -1,0 +1,70 @@
+/* Base: typography scale (PRD §4.3), focus, page defaults. */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "DM Sans Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 16px;
+    line-height: 1.55;
+    min-height: 100dvh;
+  }
+  ::selection { background: var(--primary-t); color: var(--ink); }
+
+  :focus { outline: none; }
+  :focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+  /* Inverted surfaces (footer) keep the ring visible. */
+  .on-primary :focus-visible { outline-color: var(--bg); }
+
+  button { -webkit-tap-highlight-color: transparent; }
+  img, svg { display: block; }
+  input, button, select, textarea { font: inherit; color: inherit; }
+  [hidden] { display: none !important; }
+}
+
+@layer components {
+  .font-display {
+    font-family: "Fraunces Variable", Georgia, serif;
+    font-variation-settings: "SOFT" 50;
+    font-optical-sizing: auto;
+  }
+  .t-h1 { font-family: "Fraunces Variable", Georgia, serif; font-variation-settings: "SOFT" 50; font-size: clamp(40px, 5.2vw, 68px); line-height: 1.04; font-weight: 400; letter-spacing: -0.02em; }
+  .t-h2 { font-family: "Fraunces Variable", Georgia, serif; font-variation-settings: "SOFT" 50; font-size: clamp(30px, 3.4vw, 44px); line-height: 1.1; font-weight: 400; letter-spacing: -0.015em; }
+  .t-h3 { font-family: "Fraunces Variable", Georgia, serif; font-variation-settings: "SOFT" 50; font-size: 24px; line-height: 1.2; font-weight: 500; letter-spacing: -0.01em; }
+  .t-h4 { font-size: 18px; line-height: 1.3; font-weight: 600; }
+  .t-body { font-size: 16px; line-height: 1.55; }
+  .t-lead { font-size: 18px; line-height: 1.55; }
+  .t-small { font-size: 14px; line-height: 1.5; }
+  .t-caption { font-size: 12px; line-height: 1.4; }
+  .t-label { font-size: 12px; line-height: 1.3; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+  .t-figure { font-family: "Fraunces Variable", Georgia, serif; font-variation-settings: "SOFT" 50; font-size: 56px; line-height: 1; font-weight: 400; letter-spacing: -0.02em; font-variant-numeric: tabular-nums lining-nums; }
+  .t-amount { font-size: 16px; line-height: 1; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .tnum { font-variant-numeric: tabular-nums lining-nums; }
+
+  .container-page {
+    width: 100%;
+    max-width: 1200px;
+    margin-inline: auto;
+    padding-inline: 24px;
+  }
+  @media (min-width: 768px) { .container-page { padding-inline: 48px; } }
+  @media (min-width: 1024px) { .container-page { padding-inline: 80px; max-width: calc(1200px + 160px); } }
+  @media (min-width: 1536px) { .container-page { max-width: calc(1320px + 160px); } }
+
+  .sr-only-focusable:not(:focus) {
+    position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+  }
+}

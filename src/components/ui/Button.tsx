@@ -1,73 +1,71 @@
-import React from 'react';
-import { cn } from '../../lib/utils';
-import { Loader2, Check } from 'lucide-react';
+import React, { forwardRef } from 'react';
+import { Check } from 'lucide-react';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'accent' | 'ghost' | 'outline' | 'destructive';
-  size?: 'sm' | 'md' | 'lg' | 'icon';
-  loading?: boolean;
-  success?: boolean;
-  icon?: React.ReactNode;
-  iconPosition?: 'left' | 'right';
+  variant?: 'primary' | 'secondary' | 'text' | 'destructive' | 'inverted';
+  size?: 'md' | 'sm';
+  isLoading?: boolean;
+  isSuccess?: boolean;
+  isError?: boolean;
+  fullWidth?: boolean;
+  leftIcon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
 }
 
-export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
-      className,
       variant = 'primary',
       size = 'md',
-      loading = false,
-      success = false,
-      disabled,
+      isLoading = false,
+      isSuccess = false,
+      isError = false,
+      fullWidth = false,
+      leftIcon,
+      rightIcon,
       children,
-      icon,
-      iconPosition = 'left',
-      type = 'button',
+      className = '',
+      disabled,
       ...props
     },
     ref
   ) => {
-    const baseStyles = 'inline-flex items-center justify-center font-medium transition-all duration-150 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none select-none rounded-md outline-none';
+    let baseClass = 'btn';
+    if (variant === 'primary') baseClass += ' btn-primary';
+    else if (variant === 'secondary') baseClass += ' btn-secondary';
+    else if (variant === 'text') baseClass += ' btn-text';
+    else if (variant === 'destructive') baseClass += ' btn-destructive';
+    else if (variant === 'inverted') baseClass += ' btn-inverted';
 
-    const variants = {
-      primary: 'bg-primary text-white hover:bg-primary-hover active:bg-primary-active shadow-sm',
-      secondary: 'bg-sand-soft text-ink hover:bg-[#E6DDCB] active:bg-[#DFD4BF] border border-border',
-      accent: 'bg-accent text-white hover:bg-accent-hover active:bg-[#8D4D28] shadow-sm',
-      ghost: 'text-ink hover:bg-sand-soft/60 active:bg-sand-soft',
-      outline: 'border border-border text-ink hover:bg-sand-soft/50 active:bg-sand-soft',
-      destructive: 'bg-error text-white hover:bg-[#913A33] active:bg-[#7D322B] shadow-sm',
-    };
-
-    const sizes = {
-      sm: 'text-xs px-3 py-1.5 h-8 gap-1.5',
-      md: 'text-sm px-4 py-2.5 h-10 gap-2',
-      lg: 'text-base px-6 py-3.5 h-12 gap-2.5 min-h-[48px]',
-      icon: 'h-10 w-10 p-0',
-    };
+    if (size === 'sm') baseClass += ' btn-sm';
+    if (fullWidth) baseClass += ' btn-block';
+    if (isLoading) baseClass += ' is-loading';
+    if (isSuccess) baseClass += ' is-success';
+    if (isError) baseClass += ' is-error';
 
     return (
       <button
         ref={ref}
-        type={type}
-        disabled={disabled || loading}
-        className={cn(baseStyles, variants[variant], sizes[size], className)}
+        disabled={disabled || isLoading}
+        className={`${baseClass} ${className}`}
         {...props}
       >
-        {loading ? (
-          <Loader2 className="h-4 w-4 animate-spin text-current" />
-        ) : success ? (
-          <Check className="h-4 w-4 text-current animate-in zoom-in" />
-        ) : (
-          <>
-            {icon && iconPosition === 'left' && <span className="shrink-0">{icon}</span>}
-            {children}
-            {icon && iconPosition === 'right' && (
-              <span className="shrink-0 transition-transform duration-150 group-hover:translate-x-0.5">
-                {icon}
-              </span>
-            )}
-          </>
+        <span className="btn-label">
+          {leftIcon}
+          {children}
+          {rightIcon && <span className="nudge">{rightIcon}</span>}
+        </span>
+
+        {isLoading && (
+          <span className="btn-state" aria-hidden="true">
+            <span className="spinner" />
+          </span>
+        )}
+
+        {isSuccess && !isLoading && (
+          <span className="btn-state" aria-hidden="true">
+            <Check size={18} strokeWidth={2} />
+          </span>
         )}
       </button>
     );

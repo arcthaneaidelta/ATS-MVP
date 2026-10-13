@@ -1,65 +1,89 @@
-# Future Shuttles & Rentals — High-Fidelity Interactive Demo
+# Save Me — High-Fidelity Demo
 
-> **Namibia Self-Drive 4x4 & Vehicle Rental Web Platform**  
-> A frontend-only, production-grade interactive prototype featuring dynamic tiered duration pricing, real-time availability & concurrency conflict engines, 4-step instant checkout with simulated DPO card payments, quotation pipeline, and an administrative fleet management portal.
+A restrained, beautifully crafted web prototype of the **Save Me** mobile app: a live phone on a calm landing page, plus full-screen app mode on real phones.
 
----
-
-## 🌟 Key Features
-
-- **Editorial Desert-Warm Design**: Custom visual tokens inspired by Namibian dunes and acacia landscapes (`#F6F2EB`, `#23302B`, `#B5683A`). Editorial typography with *Fraunces* serif headlines and *Inter* UI text with tabular numeric formatting (`font-variant-numeric: tabular-nums`).
-- **Automatic Duration-Based Pricing Engine**: Pure, deterministic tiered rate calculations stepping down daily rates at 3, 8, and 21+ days. Tested across all bracket edges.
-- **Three Distinct Money Lines**:
-  1. *Total Due Now (Charged)*: Immediate full payment for instant online bookings.
-  2. *Booking Deposit (Quotes)*: 20% required deposit for custom quotes.
-  3. *Refundable Security Deposit (Hold)*: Card pre-authorisation hold taken at vehicle handover in Windhoek (never charged today).
-- **Concurrency & Overlap Prevention (AC 8)**: Prevents simultaneous double-bookings at checkout with instant detection, alternative vehicle suggestions, and audit logging.
-- **Dual Booking Pathways**:
-  - *Option A — Instant Booking*: 4-step stepper, 10-minute hold timer, simulated DPO card sheet with demo controls (success, declined, conflict), calendar `.ics` download, print receipt support.
-  - *Option B — Quotations*: Inbound quote request with multi-vehicle preference chips; tokenised customer proposal page (`/quote/:ref`) with online deposit payment.
-- **Full Admin Backend (`/admin`)**:
-  - *Timeline Calendar (Hero Screen)*: 30-day visual timeline across all vehicles. Colour-coded bars for online bookings, offline VIP bookings, and maintenance blocks. Click-to-block functionality.
-  - *Bookings Table*: Search, filter, inspect payment timelines (`Initiated → Authorised → Verified → Confirmed`), and toggle card hold states.
-  - *Quotations Kanban Pipeline*: Move quotes through stages, formulate custom discounts, verify real-time fleet availability, and issue proposals.
-  - *Live Rate Bracket Editor*: Per-vehicle tier editor with an interactive calculator panel and one-click fleet sync.
-- **Floating Demo Pill**: Instant 1-click toggle between Public Website and Admin Portal with demo data reset.
+> **"Light is lovely. Clarity is cheaper. Complicated costs more."**
 
 ---
 
-## 🚀 Quick Start (Local Development)
+## 1. What This Prototype Is
+
+This is an interactive frontend prototype built to demonstrate the exact product experience, data architecture, and restraint demanded by the Save Me brief. It proves simple software can feel high-craft without being cheap or over-engineered.
+
+- **Landing Page (`/`)**: A calm marketing story with the live, working app inside a framed phone. Features the Year Ribbon showing recurring renewal days and the Horizon interactive story.
+- **Mobile Prototype (`/app`)**: The identical responsive app shell that runs full-screen on mobile devices or framed on desktop.
+- **Build Plan (`/plan`)**: Answers the client's five project questions: 5-milestone roadmap with acceptance criteria, fixed-price structure, and store-readiness checklist.
+
+---
+
+## 2. What Is Mocked vs Real
+
+| Feature | In This Demo | Production Implementation |
+|---|---|---|
+| **Bank Connection** | Simulated open-banking flow with realistic 41-transaction detection stream | TrueLayer, Plaid, or Yapily read-only AIS consent |
+| **Recurring Detection** | Pure, deterministic pattern matching engine (`src/lib/detection.ts`) | Same logic running server-side or on-device |
+| **Money Calculations** | Integer pence arithmetic for all horizons (`src/lib/money.ts`) | Identical domain maths |
+| **Cancellation** | Guided cancellation instructions with Undo and annual savings tracking | Guidance in V1; merchant direct links |
+| **Free-Trial Alerts** | Virtual clock (`src/store/virtualClock.ts`) + fast-forward push simulation | APNs / FCM scheduled notifications |
+| **Authentication** | Pre-signed session as Amira | Biometric Keychain/Keystore on-device token |
+| **Persistence** | SessionStorage (resets cleanly each new visit) | SQLite / encrypted on-device storage |
+
+---
+
+## 3. How to Swap Branding in One File
+
+All brand tokens live in [`src/styles/tokens.css`](file:///c:/Users/MUWAHHID/Downloads/Go%20High%20Level/src/styles/tokens.css).
+
+To rebrand to the client's official palette:
+1. Open `src/styles/tokens.css` and update `--primary`, `--bg`, `--accent`, etc.
+2. Tailwind CSS (`tailwind.config.ts`) reads these CSS variables directly via `var()`.
+3. Update brand strings in `src/config/brand.ts` (App name, tagline, currency).
+The entire site, framed phone, and full-screen mobile app update immediately.
+
+---
+
+## 4. How to Run Locally
 
 ```bash
-# Install dependencies
+# 1. Install dependencies
 npm install
 
-# Start Vite dev server
-npm run dev
-
-# Run engine unit tests
+# 2. Run unit tests (money rounding, detection, virtual clock)
 npm test
 
-# Build for production
+# 3. Start development server
+npm run dev
+
+# 4. Build production bundle
 npm run build
 ```
 
 ---
 
-## 🌐 Netlify Deployment
+## 5. Client Requirements Traceability Matrix
 
-This repository is pre-configured for **1-click Netlify hosting**:
-
-1. **Build Command**: `npm run build`
-2. **Publish Directory**: `dist`
-3. **SPA Redirects**: Included via `netlify.toml` and `public/_redirects` to ensure clean client-side routing on all deep links (`/fleet`, `/book`, `/admin`, etc.).
+| # | Requirement | Implementation in Demo |
+|---|---|---|
+| 1 | Clean, simple interface | 3 tabs (Today, Subscriptions, Trials), max 1 primary button per screen |
+| 2 | Identify recurring payments | Connect stream where 41 transactions scroll and 10 recurring items lift into place |
+| 3 | Long-term cost horizons | Horizon scrubber on Today (£102.49/mo → £1,229.91/yr → £6,149.55 → £12,299.10) |
+| 4 | Highlight charges needing attention | "Worth a look" cards with plain-language reasons and evidence timelines |
+| 5 | Simple review / manage actions | Keep, Review later, and Cancel with real-time Saved pill and Undo toast |
+| 6 | Free-trial reminders | Trials tab with countdown rings and "Protect" toggle |
+| 7 | Push notifications | Lock-screen push mock triggered by "Fast-forward 5 days" demo control |
+| 8 | Secure data handling | "Your data" sheet with read-only breakdown and 3-step Disconnect & Delete animation |
+| 9 | Native iOS/Android taste | Device-aware frames, spring physics (`motion`), 100dvh safe-area support |
+| 10 | Store readiness | `/plan` page includes store privacy labels, data safety forms, and icon checklist |
+| 11 | Maintainable code | Strict TypeScript, pure domain libraries, zero bloated dependencies |
+| 12 | Fixed price & milestones | 5 milestones with acceptance criteria and payment percentage splits on `/plan` |
 
 ---
 
-## 🛠️ Tech Stack
+## 6. Technology Stack Justification
 
-- **Framework**: React 19 + TypeScript + Vite
-- **Styling**: Tailwind CSS + Custom CSS Variables Token System
-- **State Management**: Zustand with `localStorage` persistence
-- **Animations**: Framer Motion
-- **Icons**: Lucide React
-- **Date Arithmetic**: date-fns
-- **Unit Testing**: Node.js Native Test Runner via `tsx`
+- **Vite + React 18 + TypeScript**: Type-safe, high performance, and directly translatable to a React Native / Expo production codebase.
+- **Tailwind CSS + CSS Variables**: Design token single-source of truth.
+- **Motion (`motion/react`)**: 60fps spring transitions for sheets, toasts, and lock screen without layout shifting.
+- **Zustand**: Lightweight global state with `sessionStorage` hydration.
+- **Self-hosted Variable Fonts**: `@fontsource-variable/fraunces` and `@fontsource-variable/dm-sans` (no runtime Google Fonts requests).
+- **Vitest**: Fast unit test suite covering financial precision and recurring transaction classification.

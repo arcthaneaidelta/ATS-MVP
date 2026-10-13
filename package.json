@@ -1,39 +1,37 @@
 {
-  "name": "go-high-level",
+  "name": "save-me-demo",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "description": "High-fidelity web prototype of the Save Me subscription check-up app. Frontend only, mocked backend.",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "oxlint",
+    "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "test": "tsx --test src/lib/engine.test.ts"
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@types/canvas-confetti": "^1.9.0",
-    "canvas-confetti": "^1.9.4",
-    "clsx": "^2.1.1",
-    "date-fns": "^4.4.0",
-    "framer-motion": "^14.1.0",
-    "lucide-react": "^1.55.0",
-    "react": "^19.2.8",
-    "react-dom": "^19.2.8",
-    "react-router-dom": "^7.18.4",
-    "tailwind-merge": "^3.7.0",
-    "zustand": "^5.0.15"
+    "@fontsource-variable/dm-sans": "^5.2.5",
+    "@fontsource-variable/fraunces": "^5.2.5",
+    "date-fns": "^4.1.0",
+    "lucide-react": "^0.468.0",
+    "motion": "^12.4.7",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.28.0",
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
-    "@types/node": "^24.13.3",
-    "@types/react": "^19.2.18",
-    "@types/react-dom": "^19.2.7",
-    "@vitejs/plugin-react": "^6.1.1",
-    "autoprefixer": "^10.6.1",
-    "oxlint": "^1.81.0",
-    "postcss": "^8.5.29",
-    "tailwindcss": "^3.4.19",
-    "tsx": "^4.23.15",
-    "typescript": "~6.0.2",
-    "vite": "^8.3.0"
+    "@types/node": "^22.10.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "typescript": "~5.7.2",
+    "vite": "^6.0.7",
+    "vitest": "^2.1.8"
   }
 }

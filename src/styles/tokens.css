@@ -1,58 +1,37 @@
+/*
+ * Save Me — design tokens. THE single source of brand truth.
+ * Placeholder branding: swap these values for the client's palette, radius and motion
+ * and the whole product (landing, app, plan) re-skins. Tailwind reads these via var().
+ */
 :root {
-  /* color */
-  --bg: #F6F2EB;
-  --surface: #FFFFFF;
-  --surface-elevated: #FBF8F3;
-  --surface-2: #FBF8F3;
-  --ink: #1D211E;
-  --ink-2: #555B55;
-  --ink-3: #8A8E86;
-  --border: #E3DDD1;
-  --border-strong: #CFC7B8;
-  --primary: #23302B;
-  --primary-hover: #2F403A;
-  --primary-active: #1A2420;
-  --accent: #B5683A;
-  --accent-hover: #9E5830;
-  --accent-soft: #F1E3D8;
-  --sand: #D9CDB8;
-  --sand-soft: #EDE6D8;
-  --success: #3E7A58;
-  --success-soft: #E3EFE8;
-  --warning: #A97A22;
-  --warning-soft: #F6EBD3;
-  --error: #A9453D;
-  --error-soft: #F5E2DF;
-  --info: #3F6785;
-  --info-soft: #E1EAF0;
-
+  /* colour */
+  --bg:#F7F5F0; --surface:#FFFFFF; --surface-2:#EFECE5;
+  --ink:#1E2A2B; --ink-2:#4F5B5C; --ink-3:#65706F;
+  --line:#E4E0D6; --line-2:#CFCABD;
+  --primary:#2F5D55; --primary-h:#264D46; --primary-a:#1E3F39; --primary-t:#E3EDE9;
+  --secondary:#8FA89F;
+  --accent:#B4543A; --accent-t:#F6E4DC;
+  --success:#3F7D5B; --warning:#8A5A12; --warning-t:#F7ECD4;
+  --error:#B3443A; --error-t:#F5DFDC; --info:#3F6F8F; --info-t:#E1ECF2;
+  /* spacing (4px base) */
+  --s-1:4px; --s-2:8px; --s-3:12px; --s-4:16px; --s-5:24px; --s-6:32px; --s-7:48px; --s-8:64px; --s-9:96px; --s-10:128px;
   /* radius */
-  --r-sm: 6px;
-  --r-md: 10px;
-  --r-lg: 16px;
-  --r-xl: 24px;
-
+  --r-sm:8px; --r-md:14px; --r-lg:20px; --r-pill:999px; --r-phone:48px;
   /* shadow */
-  --sh-1: 0 1px 2px rgba(29, 33, 30, 0.06);
-  --sh-2: 0 6px 20px -8px rgba(29, 33, 30, 0.16);
-  --sh-3: 0 24px 60px -24px rgba(29, 33, 30, 0.28);
-
-  /* type */
-  --font-display: 'Fraunces', Georgia, serif;
-  --font-body: 'Inter', system-ui, sans-serif;
-
+  --sh-1:0 1px 2px rgba(30,42,43,.06);
+  --sh-2:0 4px 16px rgba(30,42,43,.07);
+  --sh-sheet:0 -8px 32px rgba(30,42,43,.12);
+  --sh-phone:0 40px 80px -24px rgba(30,42,43,.22);
   /* motion */
-  --d-fast: 140ms;
-  --d-med: 260ms;
-  --d-slow: 600ms;
-  --e-out: cubic-bezier(0.22, 1, 0.36, 1);
-  --e-inout: cubic-bezier(0.76, 0, 0.24, 1);
-  --e-std: cubic-bezier(0.2, 0, 0, 1);
-
+  --d-fast:140ms; --d-med:260ms; --d-slow:520ms; --d-hero:900ms;
+  --ease-out:cubic-bezier(.22,1,.36,1);
+  --ease-inout:cubic-bezier(.65,0,.35,1);
   /* z-index */
-  --z-header: 40;
-  --z-drawer: 60;
-  --z-modal: 70;
-  --z-toast: 80;
-  --z-intro: 100;
+  --z-sticky:10; --z-nav:20; --z-sheet:40; --z-toast:50; --z-lock:60; --z-loader:100;
+
+  /* derived (not brand values; computed from the above) */
+  --scrim: rgba(30,42,43,.32);
+  --tab-h: 64px;
+  --header-h: 56px;
 }
+@media (prefers-reduced-motion: reduce){ :root{ --d-fast:1ms; --d-med:1ms; --d-slow:1ms; --d-hero:1ms; } }

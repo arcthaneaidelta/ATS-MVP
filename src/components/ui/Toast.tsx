@@ -1,90 +1,55 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, AlertTriangle, AlertCircle, Info, X } from 'lucide-react';
-import { cn } from '../../lib/utils';
+import React, { useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { toastVariants } from '@/lib/motion';
 
-export type ToastType = 'success' | 'warning' | 'error' | 'info';
-
-interface ToastItem {
-  id: string;
-  type: ToastType;
-  title: string;
-  message?: string;
+export interface ToastProps {
+  message: string | null;
+  actionLabel?: string;
+  onAction?: () => void;
+  onDismiss: () => void;
+  duration?: number;
 }
 
-interface ToastContextType {
-  toast: (opts: { type?: ToastType; title: string; message?: string }) => void;
-}
-
-const ToastContext = createContext<ToastContextType | undefined>(undefined);
-
-export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [toasts, setToasts] = useState<ToastItem[]>([]);
-
-  const toast = useCallback(({ type = 'info', title, message }: { type?: ToastType; title: string; message?: string }) => {
-    const id = `toast-${Date.now()}-${Math.random()}`;
-    setToasts((prev) => [...prev, { id, type, title, message }]);
-
-    setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, 4000);
-  }, []);
-
-  const dismiss = (id: string) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
-  };
-
-  const icons: Record<ToastType, React.ReactNode> = {
-    success: <CheckCircle2 className="w-5 h-5 text-success" />,
-    warning: <AlertTriangle className="w-5 h-5 text-warning" />,
-    error: <AlertCircle className="w-5 h-5 text-error" />,
-    info: <Info className="w-5 h-5 text-info" />,
-  };
+export function Toast({
+  message,
+  actionLabel,
+  onAction,
+  onDismiss,
+  duration = 4000,
+}: ToastProps) {
+  useEffect(() => {
+    if (!message) return;
+    const timer = setTimeout(() => {
+      onDismiss();
+    }, duration);
+    return () => clearTimeout(timer);
+  }, [message, duration, onDismiss]);
 
   return (
-    <ToastContext.Provider value={{ toast }}>
-      {children}
-      <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-toast flex flex-col gap-2.5 max-w-sm w-full pointer-events-none px-4 sm:px-0">
-        <AnimatePresence>
-          {toasts.map((t) => (
-            <motion.div
-              key={t.id}
-              initial={{ opacity: 0, y: 16, scale: 0.96 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.15 } }}
-              transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-              className={cn(
-                'pointer-events-auto flex items-start gap-3 p-4 bg-surface rounded-lg shadow-sh-3 border border-border text-left',
-                t.type === 'error' && 'border-error/30',
-                t.type === 'success' && 'border-success/30'
-              )}
-            >
-              <div className="shrink-0 mt-0.5">{icons[t.type]}</div>
-              <div className="flex-1 min-w-0 pr-1">
-                <h5 className="text-sm font-semibold text-ink leading-tight">{t.title}</h5>
-                {t.message && <p className="text-xs text-ink-2 mt-1 leading-normal">{t.message}</p>}
-              </div>
+    <AnimatePresence>
+      {message && (
+        <div className="absolute bottom-[72px] left-0 right-0 z-toast flex justify-center px-4 pointer-events-none">
+          <motion.div
+            role="status"
+            variants={toastVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="pointer-events-auto h-11 px-4 bg-ink text-surface rounded-pill shadow-sheet flex items-center gap-3 text-sm font-medium"
+          >
+            <span>{message}</span>
+            {actionLabel && onAction && (
               <button
-                onClick={() => dismiss(t.id)}
-                className="p-1 -mr-1 -mt-1 text-ink-3 hover:text-ink transition-colors rounded"
-                aria-label="Dismiss"
+                type="button"
+                onClick={onAction}
+                className="text-primary-t hover:underline font-semibold text-xs ml-1 focus-visible:outline-none"
               >
-                <X className="w-4 h-4" />
+                {actionLabel}
               </button>
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </div>
-    </ToastContext.Provider>
+            )}
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
   );
-};
-
-export function useToast() {
-  const ctx = useContext(ToastContext);
-  if (!ctx) {
-    return {
-      toast: () => {},
-    };
-  }
-  return ctx;
 }
