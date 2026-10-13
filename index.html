@@ -1,36 +1,18 @@
 <!doctype html>
-<html lang="en-GB">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Save Me — See what your subscriptions really cost</title>
-    <meta
-      name="description"
-      content="Save Me finds the payments that repeat, shows what they add up to over time, and points out the few worth a second look. A working prototype."
-    />
-    <meta name="theme-color" content="#F7F5F0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta property="og:title" content="Save Me — Open it. See what it costs. Know what to do." />
-    <meta
-      property="og:description"
-      content="A calm subscription check-up. Working prototype with a mocked backend."
-    />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="/og.png" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <!-- Critical CSS: paint the paper background before any JS so there is never a white flash. -->
-    <style>
-      html,body{background:#F7F5F0;margin:0;color:#1E2A2B}
-      #boot{position:fixed;inset:0;background:#F7F5F0;z-index:100}
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    <title>BionicIQ Ecosystem — Corporate, Academy & Cirqla</title>
+    <meta name="description" content="Three products. One engineering standard. BionicIQ builds the platforms behind how businesses present themselves, how people learn and how venues serve." />
+    <!-- Typography: Instrument Serif, Geist & Geist Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   </head>
-  <body>
-    <div id="root"><div id="boot" aria-hidden="true"></div></div>
-    <noscript>
-      <p style="font-family:Georgia,serif;padding:48px;max-width:40ch">
-        Save Me is an interactive prototype and needs JavaScript to run.
-      </p>
-    </noscript>
+  <body class="bg-bg text-ink antialiased selection:bg-clay-tint selection:text-ink min-h-screen">
+    <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

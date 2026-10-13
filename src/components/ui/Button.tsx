@@ -1,71 +1,77 @@
 import React, { forwardRef } from 'react';
-import { Check } from 'lucide-react';
+import { Loader2, Check } from 'lucide-react';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'text' | 'destructive' | 'inverted';
-  size?: 'md' | 'sm';
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'icon';
+  size?: 'sm' | 'md' | 'lg';
   isLoading?: boolean;
   isSuccess?: boolean;
-  isError?: boolean;
-  fullWidth?: boolean;
-  leftIcon?: React.ReactNode;
-  rightIcon?: React.ReactNode;
+  loadingText?: string;
+  successText?: string;
+  block?: boolean;
+  icon?: React.ReactNode;
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
+      children,
       variant = 'primary',
       size = 'md',
       isLoading = false,
       isSuccess = false,
-      isError = false,
-      fullWidth = false,
-      leftIcon,
-      rightIcon,
-      children,
-      className = '',
+      loadingText,
+      successText,
+      block = false,
+      icon,
       disabled,
+      className = '',
       ...props
     },
     ref
   ) => {
-    let baseClass = 'btn';
-    if (variant === 'primary') baseClass += ' btn-primary';
-    else if (variant === 'secondary') baseClass += ' btn-secondary';
-    else if (variant === 'text') baseClass += ' btn-text';
-    else if (variant === 'destructive') baseClass += ' btn-destructive';
-    else if (variant === 'inverted') baseClass += ' btn-inverted';
+    const baseStyles =
+      'inline-flex items-center justify-center font-sans font-medium transition-all duration-150 relative select-none disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none active:scale-[0.98] outline-none focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2';
 
-    if (size === 'sm') baseClass += ' btn-sm';
-    if (fullWidth) baseClass += ' btn-block';
-    if (isLoading) baseClass += ' is-loading';
-    if (isSuccess) baseClass += ' is-success';
-    if (isError) baseClass += ' is-error';
+    const variants = {
+      primary: 'bg-clay text-white hover:bg-clay-h active:bg-clay-a rounded-md shadow-sm',
+      secondary: 'bg-primary text-white hover:bg-primary-h active:bg-primary-a rounded-md shadow-sm',
+      ghost: 'bg-transparent text-ink border border-line-2 hover:bg-surface hover:border-ink-3 rounded-md',
+      danger: 'bg-err text-white hover:bg-red-700 active:bg-red-800 rounded-md',
+      icon: 'p-2 text-ink-2 hover:text-ink hover:bg-surface rounded-full',
+    };
+
+    const sizes = {
+      sm: 'text-xs px-3 py-1.5 h-8 gap-1.5',
+      md: 'text-sm px-4 py-2.5 h-10 gap-2',
+      lg: 'text-base px-6 py-3 h-12 gap-2.5',
+    };
+
+    const sizeClass = variant === 'icon' ? '' : sizes[size];
+    const widthClass = block ? 'w-full' : '';
 
     return (
       <button
         ref={ref}
-        disabled={disabled || isLoading}
-        className={`${baseClass} ${className}`}
+        disabled={disabled || isLoading || isSuccess}
+        className={`${baseStyles} ${variants[variant]} ${sizeClass} ${widthClass} ${className}`}
         {...props}
       >
-        <span className="btn-label">
-          {leftIcon}
-          {children}
-          {rightIcon && <span className="nudge">{rightIcon}</span>}
-        </span>
-
-        {isLoading && (
-          <span className="btn-state" aria-hidden="true">
-            <span className="spinner" />
+        {isLoading ? (
+          <span className="flex items-center gap-2">
+            <Loader2 className="w-4 h-4 animate-spin shrink-0" />
+            <span>{loadingText || children}</span>
           </span>
-        )}
-
-        {isSuccess && !isLoading && (
-          <span className="btn-state" aria-hidden="true">
-            <Check size={18} strokeWidth={2} />
+        ) : isSuccess ? (
+          <span className="flex items-center gap-2 text-white">
+            <Check className="w-4 h-4 shrink-0 text-white stroke-[2.5]" />
+            <span>{successText || 'Completed'}</span>
           </span>
+        ) : (
+          <>
+            {icon && <span className="shrink-0">{icon}</span>}
+            {children}
+          </>
         )}
       </button>
     );

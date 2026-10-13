@@ -1,89 +1,133 @@
-# Save Me — High-Fidelity Demo
+# BionicIQ Ecosystem Demo
 
-A restrained, beautifully crafted web prototype of the **Save Me** mobile app: a live phone on a calm landing page, plus full-screen app mode on real phones.
-
-> **"Light is lovely. Clarity is cheaper. Complicated costs more."**
+> **Client Evaluation Prototype** — Three products under one engineering standard: BionicIQ Corporate, BionicIQ Academy (LMS), and Cirqla (Multi-tenant Hospitality SaaS), plus the Proposal Companion and Design System verification route.
 
 ---
 
-## 1. What This Prototype Is
-
-This is an interactive frontend prototype built to demonstrate the exact product experience, data architecture, and restraint demanded by the Save Me brief. It proves simple software can feel high-craft without being cheap or over-engineered.
-
-- **Landing Page (`/`)**: A calm marketing story with the live, working app inside a framed phone. Features the Year Ribbon showing recurring renewal days and the Horizon interactive story.
-- **Mobile Prototype (`/app`)**: The identical responsive app shell that runs full-screen on mobile devices or framed on desktop.
-- **Build Plan (`/plan`)**: Answers the client's five project questions: 5-milestone roadmap with acceptance criteria, fixed-price structure, and store-readiness checklist.
-
----
-
-## 2. What Is Mocked vs Real
-
-| Feature | In This Demo | Production Implementation |
-|---|---|---|
-| **Bank Connection** | Simulated open-banking flow with realistic 41-transaction detection stream | TrueLayer, Plaid, or Yapily read-only AIS consent |
-| **Recurring Detection** | Pure, deterministic pattern matching engine (`src/lib/detection.ts`) | Same logic running server-side or on-device |
-| **Money Calculations** | Integer pence arithmetic for all horizons (`src/lib/money.ts`) | Identical domain maths |
-| **Cancellation** | Guided cancellation instructions with Undo and annual savings tracking | Guidance in V1; merchant direct links |
-| **Free-Trial Alerts** | Virtual clock (`src/store/virtualClock.ts`) + fast-forward push simulation | APNs / FCM scheduled notifications |
-| **Authentication** | Pre-signed session as Amira | Biometric Keychain/Keystore on-device token |
-| **Persistence** | SessionStorage (resets cleanly each new visit) | SQLite / encrypted on-device storage |
-
----
-
-## 3. How to Swap Branding in One File
-
-All brand tokens live in [`src/styles/tokens.css`](file:///c:/Users/MUWAHHID/Downloads/Go%20High%20Level/src/styles/tokens.css).
-
-To rebrand to the client's official palette:
-1. Open `src/styles/tokens.css` and update `--primary`, `--bg`, `--accent`, etc.
-2. Tailwind CSS (`tailwind.config.ts`) reads these CSS variables directly via `var()`.
-3. Update brand strings in `src/config/brand.ts` (App name, tagline, currency).
-The entire site, framed phone, and full-screen mobile app update immediately.
-
----
-
-## 4. How to Run Locally
+## Quick Start & Running Locally
 
 ```bash
 # 1. Install dependencies
 npm install
 
-# 2. Run unit tests (money rounding, detection, virtual clock)
-npm test
-
-# 3. Start development server
+# 2. Run local development server
 npm run dev
 
-# 4. Build production bundle
+# 3. Build for production (strict TypeScript + Vite)
 npm run build
+
+# 4. Preview production build
+npm run preview
 ```
 
----
-
-## 5. Client Requirements Traceability Matrix
-
-| # | Requirement | Implementation in Demo |
-|---|---|---|
-| 1 | Clean, simple interface | 3 tabs (Today, Subscriptions, Trials), max 1 primary button per screen |
-| 2 | Identify recurring payments | Connect stream where 41 transactions scroll and 10 recurring items lift into place |
-| 3 | Long-term cost horizons | Horizon scrubber on Today (£102.49/mo → £1,229.91/yr → £6,149.55 → £12,299.10) |
-| 4 | Highlight charges needing attention | "Worth a look" cards with plain-language reasons and evidence timelines |
-| 5 | Simple review / manage actions | Keep, Review later, and Cancel with real-time Saved pill and Undo toast |
-| 6 | Free-trial reminders | Trials tab with countdown rings and "Protect" toggle |
-| 7 | Push notifications | Lock-screen push mock triggered by "Fast-forward 5 days" demo control |
-| 8 | Secure data handling | "Your data" sheet with read-only breakdown and 3-step Disconnect & Delete animation |
-| 9 | Native iOS/Android taste | Device-aware frames, spring physics (`motion`), 100dvh safe-area support |
-| 10 | Store readiness | `/plan` page includes store privacy labels, data safety forms, and icon checklist |
-| 11 | Maintainable code | Strict TypeScript, pure domain libraries, zero bloated dependencies |
-| 12 | Fixed price & milestones | 5 milestones with acceptance criteria and payment percentage splits on `/plan` |
+Open your browser to `http://localhost:5173`.
 
 ---
 
-## 6. Technology Stack Justification
+## 🧭 Complete Route Map
 
-- **Vite + React 18 + TypeScript**: Type-safe, high performance, and directly translatable to a React Native / Expo production codebase.
-- **Tailwind CSS + CSS Variables**: Design token single-source of truth.
-- **Motion (`motion/react`)**: 60fps spring transitions for sheets, toasts, and lock screen without layout shifting.
-- **Zustand**: Lightweight global state with `sessionStorage` hydration.
-- **Self-hosted Variable Fonts**: `@fontsource-variable/fraunces` and `@fontsource-variable/dm-sans` (no runtime Google Fonts requests).
-- **Vitest**: Fast unit test suite covering financial precision and recurring transaction classification.
+| Zone | Route | Description & Features |
+| :--- | :--- | :--- |
+| **Corporate** | `/` | **Home**: Asymmetric hero with 14s live ecosystem loop, pinned scroll story, live QR code |
+| | `/services` | 4 service lines, interactive capability accordions, case study links |
+| | `/products` | Academy & Cirqla vignettes with live launcher and capability highlights |
+| | `/case-studies` | Filterable 2-column portfolio grid with category chips |
+| | `/case-studies/:slug` | Scroll-story case study, architecture diagram, sticky device frames, outcomes |
+| | `/careers` | Job filter (team, location), 560px sliding apply drawer with 3-step submission |
+| | `/about` | Editorial layout, 4 principles, team avatars, "How we work" timeline |
+| | `/contact` | 3-step qualified lead form, CRM leads intake dock, error simulations |
+| | `/insights` | Editorial blog articles, reading progress TOC, SEO schema markers |
+| **Academy** | `/academy` | **Academy Landing**: 3-card fan out, course preview, curriculum breakdown |
+| | `/academy/courses` | Catalog with search, category checkboxes, difficulty filters, and price ranges |
+| | `/academy/courses/:slug` | Course detail, syllabus modules, instructor bio, sticky checkout trigger |
+| | `/academy/app` | **Student Dashboard**: Streaks, progress rings, weekly activity, resume lessons |
+| | `/academy/app/courses/:slug/lessons/:id` | **Course Player**: 70/30 video layout, scrubber, speed control, markdown notes |
+| | `/academy/app/quiz` | **Timed Quiz**: 5 questions, 8-min countdown, immediate score ring & cert unlock |
+| | `/academy/app/certificates` | **Diploma View**: Printable A4-landscape certificate with verification code |
+| | `/academy/verify/:id` | **Public Verification**: Real-time status lookup (Valid / Revoked) |
+| | `/academy/admin` | **Admin Console**: Course publishing, student enrollment list, refunds, revokes |
+| **Cirqla Diner** | `/cirqla` | **Marketing**: Live table QR code, interactive theme switch preview |
+| | `/cirqla/scan/:venue` | **Customer App**: Phone frame (desktop) / full-bleed (mobile), modifiers, cart, tracker |
+| **Cirqla Venue** | `/cirqla/venue/orders` | **Live Order Board**: 3-column Kanban, synthesized audio chime, 80mm thermal print |
+| | `/cirqla/venue/menu` | Menu manager, sold-out toggles, branch price overrides, bulk CSV import modal |
+| | `/cirqla/venue/payments` | Financial ledger with status chips, payouts summary, export to CSV |
+| | `/cirqla/venue/analytics` | Hourly sales bars with peak hour highlighting, prep time trends, data tables |
+| | `/cirqla/venue/staff` | Role-based staff directory (Owner/Manager/Kitchen/FOH), invite modal, undo toast |
+| | `/cirqla/venue/branches` | Branch profiles, printable table QR code matrix generator, brand palette picker |
+| **Super-Admin** | `/cirqla/platform` | 38 tenants list, GMV charts, 90-day uptime SVG strips, suspend/view-as-venue |
+| **Proposal** | `/proposal` | **Proposal Companion**: 3-lane interactive architecture SVG, milestone/monthly toggle |
+| **Design Kit** | `/__kit` | **Component Kitchen Sink**: Button variants, input states, badges, skeletons |
+
+---
+
+## 🎬 The First 2 Minutes (Choreographed Demo Journey)
+
+1. **0:00 – 0:05 | Loading Sequence & First Impression**
+   - Clean entrance loader with warm paper canvas (`#F6F3ED`), Instrument Serif wordmark, and hairline progress bar.
+   - Smooth slide-up into the hero. The **Live Ecosystem Scene** begins executing its continuous 14-second order simulation across the diner phone and kitchen board.
+
+2. **0:05 – 0:40 | The Cirqla Real-Time Order Loop (The Centerpiece)**
+   - Click the live table QR code on `/cirqla` or scroll to the Cirqla spotlight on the homepage.
+   - The diner customer app launches in the desktop phone frame (`/cirqla/scan/kiln-street?table=12`).
+   - Add **Slow-Cooked Short Rib** (choose required side: *fries*) and **House Lemonade**.
+   - Open cart, apply a tip, and pay using the test card `4242 4242 4242 4242`.
+   - The order tracker enters **Received** status.
+   - **Cross-Tab Realtime:** Open `/cirqla/venue/orders` in a second tab (or split screen). Order **#1048** slides immediately into the *New* column with an arrival chime.
+   - Click **Accept** on the venue dashboard → switch back to the diner tab to see the tracker advance live to **Preparing** (<300ms latency via `BroadcastChannel`).
+
+3. **0:40 – 1:10 | CMS Live Inline Editing & SEO Panel**
+   - Return to the Corporate homepage (`/`).
+   - Click the floating **Edit Page (CMS)** pill in the bottom-right corner.
+   - Dashed outlines highlight editable sections. Click the hero headline and type live changes.
+   - In the right-hand panel, switch to the **SEO tab**: modify the Meta Title or Description and watch the live Google Search snippet and social card update character-by-character with green checklist ticks.
+
+4. **1:10 – 1:40 | The Academy LMS Learning Loop**
+   - Navigate to `/academy` and click **Browse Catalog** → choose *Restaurant Operations Essentials*.
+   - Click **Resume lesson** to launch the video player with chapter curriculum and notes autosave.
+   - Click **Take Assessment** to start the 5-question timed quiz.
+   - Submit answers to view the animated score ring and instantly generate an accredited **Certificate of Completion** (`BIQ-2026-00418`) with working public verification at `/academy/verify/BIQ-2026-00418`.
+
+5. **1:40 – 2:00 | Multi-Tenancy & Proposal Companion**
+   - In Cirqla Venue Settings (`/cirqla/venue/settings`), switch tenant branding from **Kiln Street Kitchen** (`#B85C3C` clay) to **Harbour Roast** (`#2F5D62`). Notice all diner screens instantly re-skin.
+   - Open `/proposal` (unlisted link in footer) to inspect the 3-lane interactive architecture diagram, stack rationale, milestone payment schedules, and source code ownership commitments.
+
+---
+
+## 💳 Magic Inputs & Test Cards
+
+### Payment Gateways (Academy & Cirqla Checkout)
+| Card Number | Expiry / CVC | Behavior / Verified State |
+| :--- | :--- | :--- |
+| `4242 4242 4242 4242` | Any future date / Any 3 digits | **Approved** — 1.4s authorization, receipt screen, moves to kitchen |
+| `4000 0000 0000 0002` | Any future date / Any 3 digits | **Declined** — Inline red banner: *"Card was declined. Try another card."* |
+| `4000 0000 0000 3220` | Any future date / Any 3 digits | **3D Secure** — Challenge modal with Approve and Cancel actions |
+
+### Coupon Code (Academy Checkout)
+- `WELCOME10` — Applies a **10% discount** with a visible deduction line item.
+- Any other code displays an inline error: *"Invalid or expired promotion code"*.
+
+### Lead Intake & Auth Edge Cases
+- Enter `error@demo.com` on `/contact` to trigger a simulated recoverable server error with a retry toast.
+- Enter `wrong@demo.com` on the Academy sign-in modal to trigger an invalid credentials shake state.
+
+---
+
+## 🎛️ Demo Controls Dock (Bottom-Left)
+
+A persistent controls pill is anchored at the bottom-left of every screen:
+- **Role Switcher**: Instantly preview views as *Diner*, *Venue Manager*, *Student*, *Academy Admin*, or *Super-Admin*.
+- **States Cycler**: Toggle between `Normal`, `Loading (Skeleton)`, `Empty State`, and `Error State` on any data view.
+- **Simulate Incoming Order**: Spawns a randomized ticket on the live kitchen board.
+- **Network Latency**: Toggle 4x latency slowdown to preview progressive loading.
+- **Arrival Chime**: Synthesized Web Audio 2-tone bell for new orders.
+- **Leads CRM Inbox**: Slide-over drawer displaying newly captured leads from `/contact`.
+- **Reset Demo Data**: Wipes local storage overrides and restores initial seed state.
+
+---
+
+## 📐 Design System & Architectural Principles
+
+- **Quiet Precision Aesthetic**: Warm paper canvas (`#F6F3ED`), deep ink-green text (`#17231F`), clay accent (`#B85C3C`), slate (`#4E6A86`), and sage (`#7F9A8B`).
+- **Strict Anti-AI Rules**: Zero gradients (except the 2% wash behind the hero), zero glassmorphism or blur, max 12px radius, no neon or floating blobs, crisp 1px hairlines.
+- **Cross-Surface Sync**: Native `BroadcastChannel('cirqla')` combined with typed Zustand stores ensures cross-tab synchronization with sub-300ms latency.
+- **Accessibility (WCAG AA)**: Full keyboard navigation, visible 2px focus rings (`:focus-visible`), aria live regions on order state updates, high contrast (>4.5:1 ratio).

@@ -6,15 +6,15 @@ export interface SkeletonProps {
   height?: string | number;
 }
 
-export function Skeleton({ className = '', width, height }: SkeletonProps) {
+export const Skeleton: React.FC<SkeletonProps> = ({
+  className = '',
+  width,
+  height,
+}) => {
   return (
     <div
-      className={`skel ${className}`}
-      style={{
-        width: typeof width === 'number' ? `${width}px` : width,
-        height: typeof height === 'number' ? `${height}px` : height,
-      }}
-      aria-hidden="true"
+      style={{ width, height }}
+      className={`bg-line/60 rounded animate-pulse ${className}`}
     />
   );
-}
+};
