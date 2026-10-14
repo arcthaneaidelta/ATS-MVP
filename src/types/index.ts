@@ -1,154 +1,170 @@
-export type UserRole = 'diner' | 'student' | 'venue_manager' | 'admin' | 'super_admin';
+export type PlatformType = 'Zoom' | 'Google Meet' | 'Microsoft Teams';
 
-export interface Tenant {
-  id: string;
-  name: string;
-  slug: string;
-  type: string;
-  accent: string;
-  branches: string[];
-  plan: 'Starter' | 'Growth' | 'Scale' | 'Trial';
-  status: 'Active' | 'Trial' | 'Suspended';
-  gmv30d: number;
-  createdAt: string;
-}
+export type OutcomeType = 'Recorded' | 'Missed';
 
-export interface MenuItemModifierOption {
-  id: string;
-  name: string;
-  priceDelta: number;
-}
+export type CauseCategory =
+  | 'Calendar sync gap'
+  | 'Recurring/rescheduled mismatch'
+  | 'Lobby / host timing'
+  | 'Platform authorisation (OAuth/token)'
+  | 'Bot scheduling/API response'
+  | 'Webhook/event delivery'
+  | 'Downstream mapping (app → Monday.com)';
 
-export interface MenuItemModifierGroup {
-  id: string;
-  name: string;
-  required: boolean;
-  min?: number;
-  max?: number;
-  options: MenuItemModifierOption[];
-}
+export type StageId = 
+  | 'calendar'
+  | 'bot_scheduled'
+  | 'bot_recording'
+  | 'transcript'
+  | 'llm_extraction'
+  | 'crm_update';
 
-export interface MenuItem {
-  id: string;
-  name: string;
-  description: string;
-  category: 'Starters' | 'Mains' | 'Sides' | 'Desserts' | 'Drinks';
-  price: number;
-  tags: ('VG' | 'V' | 'GF' | 'Spicy')[];
-  modifierGroups?: MenuItemModifierGroup[];
-  isSoldOut?: boolean;
-  branchAvailability?: Record<string, boolean>;
-}
-
-export interface OrderItem {
-  id: string;
-  menuItemId: string;
-  name: string;
-  price: number;
-  quantity: number;
-  modifiers?: { groupName: string; optionName: string; priceDelta: number }[];
-  instructions?: string;
-}
-
-export type OrderStatus = 'Received' | 'Preparing' | 'Ready' | 'Collected';
-
-export interface Order {
-  id: string;
-  orderNumber: string;
-  tenantId: string;
-  branchId: string;
-  table: string;
-  items: OrderItem[];
-  subtotal: number;
-  serviceCharge: number;
-  tax: number;
-  tip: number;
-  total: number;
-  status: OrderStatus;
-  paymentStatus: 'Paid' | 'Pay at counter' | 'Refunded';
-  paymentMethod: 'card' | 'wallet' | 'counter';
-  createdAt: string; // ISO string
-  updatedAt: string;
-  customerName?: string;
-  notes?: string;
-}
-
-export interface CourseLesson {
-  id: string;
+export interface Meeting {
+  id: string; // e.g., "MTG-1042"
   title: string;
-  duration: string;
+  account: string;
+  csm: string;
+  platform: PlatformType;
+  scheduledStart: string;
   durationMinutes: number;
-  isCompleted?: boolean;
-  isLocked?: boolean;
+  outcome: OutcomeType;
+  stageReached: string;
+  stageIdReached: StageId;
+  causeCategory: CauseCategory | null;
+  rootCauseSummary: string;
+  smallestFix: string;
+  failureEvidenceSnippet?: string;
+  externalMeetingId: string;
 }
 
-export interface CourseModule {
+export type StageStatus = 'passed' | 'failed' | 'skipped' | 'waiting';
+
+export interface PipelineStageInfo {
+  id: StageId;
+  stepNumber: number;
+  name: string;
+  subtitle: string;
+  status: StageStatus;
+  timestamp?: string;
+  evidence?: string;
+  latencyMs?: number;
+}
+
+export interface TimelineLogEntry {
   id: string;
-  title: string;
-  lessons: CourseLesson[];
-}
-
-export interface Course {
-  id: string;
-  slug: string;
-  title: string;
-  description: string;
-  level: 'Beginner' | 'Intermediate' | 'Advanced';
-  instructor: string;
-  instructorRole: string;
-  lessonCount: number;
-  durationHours: number;
-  price: number;
-  isFree?: boolean;
-  rating: number;
-  studentsEnrolled: number;
-  status: 'Published' | 'Draft' | 'Archived';
-  category: string;
-  modules: CourseModule[];
-}
-
-export interface Certificate {
-  id: string;
-  certificateNumber: string;
-  studentName: string;
-  courseTitle: string;
-  courseSlug: string;
-  issueDate: string;
-  status: 'Valid' | 'Revoked';
-  qrVerifyUrl: string;
-}
-
-export interface JobRole {
-  id: string;
-  title: string;
-  team: 'Engineering' | 'Design' | 'Product' | 'Operations';
-  location: 'Remote' | 'On-site';
-  type: string;
-  posted: string;
-  description: string;
-  requirements: string[];
-}
-
-export interface CaseStudy {
-  slug: string;
-  title: string;
-  clientType: string;
-  role: string;
-  timeline: string;
-  stack: string[];
-  summary: string;
-  challenge: string;
-  approach: string;
-  outcomeMetrics: { label: string; value: string }[];
-}
-
-export interface PaymentLedgerEntry {
-  id: string;
-  orderNumber: string;
   timestamp: string;
-  method: string;
-  amount: number;
-  fee: number;
-  status: 'Settled' | 'Pending' | 'Refunded' | 'Failed';
-  customer: string;
+  level: 'info' | 'warn' | 'error' | 'debug';
+  system: 'Google Cal' | 'Recall.ai' | 'Webhooks' | 'LLM Agent' | 'Base44' | 'Monday.com' | 'Zoom' | 'Teams';
+  event: string;
+  details: string;
+}
+
+export interface WebhookLogEntry {
+  id: string;
+  timestamp: string;
+  event: string;
+  destination: string;
+  httpStatus: number;
+  retries: number;
+  idempotencyKey: string;
+  payloadPreview: string;
+}
+
+export interface BotConfigSnapshot {
+  botId: string;
+  botName: string;
+  joinAt: string;
+  recordingMode: string;
+  waitingRoomTimeoutSeconds: number;
+  transcriptionProvider: string;
+  automaticJoin: boolean;
+  meetingUrl: string;
+  oauthScopeGranted: boolean;
+  tokenExpiresAt: string;
+}
+
+export interface ExtractionOutputSnapshot {
+  status: 'success' | 'partial' | 'failed' | 'not_reached';
+  model: string;
+  promptVersion: string;
+  tokensUsed: { prompt: number; completion: number; total: number };
+  executionTimeMs: number;
+  extractedSignalsCount: number;
+  rawJsonSnippet: string;
+}
+
+export interface MeetingTrace {
+  meetingId: string;
+  stages: PipelineStageInfo[];
+  timelineLogs: TimelineLogEntry[];
+  botConfig: BotConfigSnapshot;
+  webhookLogs: WebhookLogEntry[];
+  extractionOutput: ExtractionOutputSnapshot;
+  rootCauseCallout: {
+    title: string;
+    confidence: 'High' | 'Medium';
+    diagnosis: string;
+    smallestFix: string;
+    findingIdRef?: string;
+  };
+}
+
+export type SignalType = 'risk' | 'blocker' | 'delay' | 'milestone' | 'action_item' | 'customer_signal';
+
+export interface SignalItem {
+  id: string;
+  type: SignalType;
+  quote: string;
+  speaker: string;
+  timestamp: string;
+  confidence: number;
+  fieldMapped: string;
+  reasoning: string;
+  verdict: 'correct' | 'false_positive' | 'missed';
+  detectedBy: 'keyword' | 'context' | 'both';
+  keywordMatcherFlaggedReason?: string;
+}
+
+export interface TranscriptLine {
+  id: string;
+  speaker: string;
+  timestamp: string;
+  text: string;
+  signalId?: string;
+}
+
+export interface Finding {
+  id: string; // e.g. "FIND-01"
+  severity: 'High' | 'Medium' | 'Low';
+  title: string;
+  affectedCount: number;
+  stageTag: string;
+  smallestFixSummary: string;
+  evidence: string;
+  rootCause: string;
+  proposedFix: string;
+  riskOfChange: 'Low' | 'Medium' | 'Minimal';
+  effortHoursEstimate: string; // e.g. "4-6 hrs"
+  effort: 'S' | 'M' | 'L';
+  inScopeDefault: boolean;
+}
+
+export interface FunnelStageData {
+  stageId: StageId;
+  name: string;
+  system: string;
+  count: number;
+  dropCount: number;
+  dropPercent: number;
+  dropExplanation?: string;
+  affectedMeetingIds: string[];
+}
+
+export interface ProposalItem {
+  qNumber: string;
+  question: string;
+  summaryQuote: string;
+  answerText: string;
+  links: { route: string; label: string }[];
+  keyHighlights: string[];
 }

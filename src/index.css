@@ -1,0 +1,141 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: 'Fraunces', serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --color-paper-bg: #F6F3EE;
+  --color-paper-surface: #FBF9F6;
+  --color-paper-elevated: #FFFFFF;
+  --color-ink: #1E2A2B;
+  --color-ink-secondary: #4A5757;
+  --color-muted: #7B8786;
+  --color-hairline: #E2DDD3;
+  --color-hairline-strong: #CFC8BB;
+  
+  --color-teal-primary: #1F4B4A;
+  --color-teal-hover: #173A39;
+  --color-teal-active: #112C2B;
+  --color-teal-tint: #E3EDEB;
+
+  --color-clay: #B4643C;
+  --color-clay-tint: #F3E3D8;
+
+  --color-success: #3F7D5B;
+  --color-success-tint: #E1EEE6;
+  --color-warning: #B58A2B;
+  --color-warning-tint: #F4EAD0;
+  --color-error: #A8433A;
+  --color-error-tint: #F5DEDA;
+  --color-info: #3E6A8A;
+  --color-info-tint: #DEE9F1;
+}
+
+:root {
+  --bg: #F6F3EE;
+  --surface: #FBF9F6;
+  --elevated: #FFFFFF;
+  --ink: #1E2A2B;
+  --text-2: #4A5757;
+  --muted: #7B8786;
+  --border: #E2DDD3;
+  --border-strong: #CFC8BB;
+  --primary: #1F4B4A;
+  --primary-hover: #173A39;
+  --primary-active: #112C2B;
+  --primary-tint: #E3EDEB;
+  --accent: #B4643C;
+  --accent-tint: #F3E3D8;
+  --success: #3F7D5B;
+  --success-tint: #E1EEE6;
+  --warning: #B58A2B;
+  --warning-tint: #F4EAD0;
+  --error: #A8433A;
+  --error-tint: #F5DEDA;
+  --info: #3E6A8A;
+  --info-tint: #DEE9F1;
+  --focus: #2F7F7C;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-24: 96px;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+
+  --shadow-1: 0 1px 2px rgba(30,42,43,.06);
+  --shadow-2: 0 4px 16px rgba(30,42,43,.08);
+  --shadow-3: 0 16px 40px rgba(30,42,43,.14);
+
+  --t-fast: 150ms;
+  --t-med: 300ms;
+  --t-slow: 550ms;
+  --ease: cubic-bezier(.2,.7,.2,1);
+  --ease-in: cubic-bezier(.4,0,1,1);
+  --ease-wipe: cubic-bezier(.7,0,.2,1);
+
+  --z-sticky: 20;
+  --z-drawer: 40;
+  --z-modal: 50;
+  --z-toast: 60;
+  --z-loader: 100;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, .font-serif {
+  font-family: 'Fraunces', Georgia, serif;
+}
+
+code, pre, .font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Custom Scrollbar for flight recorder / investigation logs */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Subtle focus ring */
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
