@@ -11,7 +11,6 @@ import {
   ClipboardList,
   CheckSquare,
   BookOpen,
-  HelpCircle,
   RotateCcw,
   ArrowRight,
   Video
@@ -53,8 +52,7 @@ export const CommandPalette: React.FC = () => {
     { label: 'Diagnostic Findings Report', path: '/app/findings', icon: ClipboardList, group: 'Navigation' },
     { label: 'Scope Gate & Milestones', path: '/app/scope', icon: CheckSquare, group: 'Navigation' },
     { label: 'Operator Handoff Runbook', path: '/app/handoff', icon: BookOpen, group: 'Navigation' },
-    { label: 'Diagnostic Overview KPIs', path: '/app', icon: Activity, group: 'Navigation' },
-    { label: 'Proposal Answers (Q1–Q6)', path: '/proposal', icon: HelpCircle, group: 'Navigation' }
+    { label: 'Diagnostic Overview KPIs', path: '/app', icon: Activity, group: 'Navigation' }
   ];
 
   const filteredNav = navItems.filter((item) =>

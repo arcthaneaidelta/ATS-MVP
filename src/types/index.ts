@@ -159,12 +159,3 @@ export interface FunnelStageData {
   dropExplanation?: string;
   affectedMeetingIds: string[];
 }
-
-export interface ProposalItem {
-  qNumber: string;
-  question: string;
-  summaryQuote: string;
-  answerText: string;
-  links: { route: string; label: string }[];
-  keyHighlights: string[];
-}

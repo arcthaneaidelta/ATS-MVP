@@ -10,7 +10,6 @@ import {
   ClipboardList,
   CheckSquare,
   BookOpen,
-  HelpCircle,
   RotateCcw,
   Info,
   ChevronLeft,
@@ -107,29 +106,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false, onToggleCol
             </NavLink>
           );
         })}
-
-        <div className="pt-4 pb-1">
-          <div className="border-t border-[#E2DDD3] my-2" />
-          {!collapsed && (
-            <div className="px-3 pb-2 text-[10px] font-semibold text-[#7B8786] uppercase tracking-wider">
-              Proposal Reference
-            </div>
-          )}
-          <NavLink
-            to="/proposal"
-            title={collapsed ? 'Proposal Answers (Q1–Q6)' : undefined}
-            className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2 rounded-[8px] text-sm font-medium transition-colors ${
-                isActive
-                  ? 'bg-[#E3EDEB] text-[#1F4B4A] font-semibold border-l-2 border-[#1F4B4A]'
-                  : 'text-[#4A5757] hover:bg-[#E3EDEB]/60 hover:text-[#1E2A2B]'
-              } ${collapsed ? 'justify-center px-0' : ''}`
-            }
-          >
-            <HelpCircle className="w-4 h-4 shrink-0 text-[#B4643C]" />
-            {!collapsed && <span>Proposal Answers</span>}
-          </NavLink>
-        </div>
       </nav>
 
       {/* Bottom Footer Section */}

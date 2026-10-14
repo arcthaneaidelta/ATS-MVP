@@ -28,7 +28,6 @@ This application is designed as an editorial investigation board / flight record
 - **Findings Report (`/app/findings`)**: 6 prioritized findings with smallest reasonable fixes and "Include in scope" controls.
 - **Scope Gate (`/app/scope`)**: Milestone progression roadmap with dynamic effort hours calculator and founder approval gate.
 - **Operator Runbook (`/app/handoff`)**: 5-step checklist for missed calls, changelog, alerting rules, and one-click markdown copy/download.
-- **Proposal Answers (`/proposal`)**: 6 accordion items mapped 1:1 to questions Q1–Q6 from the client's RFP.
 
 ---
 

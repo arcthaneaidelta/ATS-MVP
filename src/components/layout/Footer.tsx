@@ -26,9 +26,9 @@ export const Footer: React.FC = () => {
                 <ArrowRight className="w-4 h-4" />
               </button>
             </Link>
-            <Link to="/proposal">
+            <Link to="/app/findings">
               <button className="px-5 py-2.5 rounded-[8px] border border-[#C4DAD7]/40 text-[#F6F3EE] font-medium text-sm hover:bg-[#173A39] transition-all cursor-pointer">
-                Read Proposal Answers
+                Explore Findings Report
               </button>
             </Link>
           </div>
@@ -73,18 +73,18 @@ export const Footer: React.FC = () => {
             </ul>
           </div>
 
-          {/* Col 2: Method & Proposal */}
+          {/* Col 2: Method & Execution */}
           <div>
             <div className="flex items-center gap-2 mb-3">
               <ShieldCheck className="w-4 h-4 text-[#C4DAD7]" />
               <h4 className="font-semibold text-sm uppercase tracking-wider text-[#FFFFFF]">
-                Diagnostic Approach
+                Diagnostic Method
               </h4>
             </div>
             <ul className="space-y-2 text-[#C4DAD7]">
               <li>
-                <Link to="/proposal" className="hover:text-white transition-colors">
-                  Proposal Answers (Q1 to Q6)
+                <Link to="/app/findings" className="hover:text-white transition-colors">
+                  Findings & Smallest Fixes
                 </Link>
               </li>
               <li>
@@ -110,7 +110,7 @@ export const Footer: React.FC = () => {
             <div className="flex items-center gap-2 mb-3">
               <Mail className="w-4 h-4 text-[#C4DAD7]" />
               <h4 className="font-semibold text-sm uppercase tracking-wider text-[#FFFFFF]">
-                Proposal Verification
+                Engineering Contact
               </h4>
             </div>
             <p className="text-[#C4DAD7] mb-2 leading-relaxed">

@@ -11,7 +11,7 @@ import {
   Sparkles,
   GitFork,
   CheckCircle2,
-  HelpCircle,
+  ClipboardList,
   ShieldAlert
 } from 'lucide-react';
 
@@ -44,9 +44,9 @@ export const LandingPage: React.FC = () => {
                   Trace a Missed Meeting
                 </Button>
               </Link>
-              <Link to="/proposal">
-                <Button variant="secondary" size="lg" className="w-full sm:w-auto" leftIcon={<HelpCircle className="w-4 h-4 text-[#7B8786]" />}>
-                  Read Proposal Answers (Q1–Q6)
+              <Link to="/app/findings">
+                <Button variant="secondary" size="lg" className="w-full sm:w-auto" leftIcon={<ClipboardList className="w-4 h-4 text-[#7B8786]" />}>
+                  Explore Findings & Scope
                 </Button>
               </Link>
             </div>

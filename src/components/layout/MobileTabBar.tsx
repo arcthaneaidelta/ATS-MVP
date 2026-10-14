@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Layers, Activity, Sparkles, MoreHorizontal, CalendarX2, GitFork, ClipboardList, CheckSquare, BookOpen, HelpCircle, X } from 'lucide-react';
+import { Layers, Activity, Sparkles, MoreHorizontal, CalendarX2, GitFork, ClipboardList, CheckSquare, BookOpen, X } from 'lucide-react';
 
 export const MobileTabBar: React.FC = () => {
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -16,8 +16,7 @@ export const MobileTabBar: React.FC = () => {
     { label: 'Delivery Funnel', to: '/app/delivery', icon: GitFork },
     { label: 'Findings Report', to: '/app/findings', icon: ClipboardList },
     { label: 'Scope Gate & Milestones', to: '/app/scope', icon: CheckSquare },
-    { label: 'Handoff Doc', to: '/app/handoff', icon: BookOpen },
-    { label: 'Proposal Answers (Q1–Q6)', to: '/proposal', icon: HelpCircle }
+    { label: 'Handoff Doc', to: '/app/handoff', icon: BookOpen }
   ];
 
   return (

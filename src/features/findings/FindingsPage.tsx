@@ -38,7 +38,7 @@ export const FindingsPage: React.FC = () => {
     addToast({
       type: 'success',
       title: 'Copied Findings to Clipboard',
-      message: 'Markdown summary ready to paste into proposal or documentation.'
+      message: 'Markdown summary ready to paste into documentation.'
     });
   };
 

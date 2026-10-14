@@ -25,8 +25,6 @@ export const AppHeader: React.FC = () => {
         return 'Scope Gate & Milestones';
       case '/app/handoff':
         return 'Operator Handoff Runbook';
-      case '/proposal':
-        return 'Proposal Answers (Q1–Q6)';
       default:
         return 'Diagnostic Console';
     }

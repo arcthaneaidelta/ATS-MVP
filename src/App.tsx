@@ -16,7 +16,6 @@ import { SignalLabPage } from './features/signals/SignalLabPage';
 import { FindingsPage } from './features/findings/FindingsPage';
 import { ScopePage } from './features/scope/ScopePage';
 import { HandoffPage } from './features/handoff/HandoffPage';
-import { ProposalPage } from './features/proposal/ProposalPage';
 
 const AppLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -56,8 +55,6 @@ export function App() {
         {/* Landing Page */}
         <Route path="/" element={<LandingPage />} />
 
-        {/* Proposal Answers (Q1 to Q6) */}
-        <Route path="/proposal" element={<ProposalPage />} />
 
         {/* Demo App Shell with nested routes */}
         <Route path="/app" element={<AppLayout />}>

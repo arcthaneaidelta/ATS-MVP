@@ -59,24 +59,19 @@ export const Navbar: React.FC = () => {
             Interactive Demo
           </Link>
           <Link
-            to="/proposal"
+            to="/app/findings"
             className={`transition-colors font-medium ${
-              location.pathname === '/proposal'
+              location.pathname === '/app/findings'
                 ? 'text-[#1F4B4A] font-semibold'
                 : 'text-[#4A5757] hover:text-[#1F4B4A]'
             }`}
           >
-            Proposal Answers (Q1–Q6)
+            Findings Report
           </Link>
         </nav>
 
         {/* Right CTA */}
         <div className="hidden md:flex items-center gap-3">
-          <Link to="/proposal">
-            <Button variant="ghost" size="sm">
-              Read Q1–Q6
-            </Button>
-          </Link>
           <Link to="/app/trace">
             <Button variant="primary" size="sm" rightIcon={<ArrowRight className="w-4 h-4" />}>
               Open Demo
@@ -112,11 +107,11 @@ export const Navbar: React.FC = () => {
             Interactive Demo (/app/trace)
           </Link>
           <Link
-            to="/proposal"
+            to="/app/findings"
             onClick={() => setMobileMenuOpen(false)}
             className="px-3 py-2 rounded text-sm text-[#1E2A2B] font-medium hover:bg-[#E3EDEB]"
           >
-            Proposal Answers (Q1–Q6)
+            Findings Report
           </Link>
           <div className="pt-2 border-t border-[#E2DDD3] flex gap-2">
             <Link to="/app/trace" className="w-full" onClick={() => setMobileMenuOpen(false)}>
