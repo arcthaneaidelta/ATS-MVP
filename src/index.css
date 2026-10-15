@@ -1,114 +1,95 @@
 @import "tailwindcss";
 
-@theme {
-  --font-serif: 'Fraunces', serif;
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+:root {
+  --meridian-bg: #F7F5F0;
+  --meridian-surface: #FFFFFF;
+  --meridian-surface-elevated: #FDFCFA;
+  --meridian-surface-sunken: #EFEBE3;
+  --meridian-primary: #1F4D45;
+  --meridian-primary-hover: #173C36;
+  --meridian-primary-active: #112D29;
+  --meridian-primary-tint: #E3EDEA;
+  --meridian-secondary: #3C4A57;
+  --meridian-accent: #C4613A;
+  --meridian-accent-tint: #F6E6DE;
+  --meridian-text-primary: #1C2421;
+  --meridian-text-secondary: #4D5753;
+  --meridian-text-muted: #7A837F;
+  --meridian-border: #E1DCD1;
+  --meridian-border-strong: #C9C2B3;
+  --meridian-success: #2F7A55;
+  --meridian-success-tint: #E1F0E8;
+  --meridian-warning: #B7791F;
+  --meridian-warning-tint: #FBF0D9;
+  --meridian-error: #B3382F;
+  --meridian-error-tint: #F8E3E0;
+  --meridian-info: #2F5F8A;
+  --meridian-info-tint: #E1EBF4;
 
-  --color-paper-bg: #F6F3EE;
-  --color-paper-surface: #FBF9F6;
-  --color-paper-elevated: #FFFFFF;
-  --color-ink: #1E2A2B;
-  --color-ink-secondary: #4A5757;
-  --color-muted: #7B8786;
-  --color-hairline: #E2DDD3;
-  --color-hairline-strong: #CFC8BB;
-  
-  --color-teal-primary: #1F4B4A;
-  --color-teal-hover: #173A39;
-  --color-teal-active: #112C2B;
-  --color-teal-tint: #E3EDEB;
-
-  --color-clay: #B4643C;
-  --color-clay-tint: #F3E3D8;
-
-  --color-success: #3F7D5B;
-  --color-success-tint: #E1EEE6;
-  --color-warning: #B58A2B;
-  --color-warning-tint: #F4EAD0;
-  --color-error: #A8433A;
-  --color-error-tint: #F5DEDA;
-  --color-info: #3E6A8A;
-  --color-info-tint: #DEE9F1;
+  --sh-1: 0 1px 2px rgba(28, 36, 33, 0.06);
+  --sh-2: 0 4px 16px rgba(28, 36, 33, 0.08);
+  --sh-3: 0 16px 48px rgba(28, 36, 33, 0.14);
 }
 
-:root {
-  --bg: #F6F3EE;
-  --surface: #FBF9F6;
-  --elevated: #FFFFFF;
-  --ink: #1E2A2B;
-  --text-2: #4A5757;
-  --muted: #7B8786;
-  --border: #E2DDD3;
-  --border-strong: #CFC8BB;
-  --primary: #1F4B4A;
-  --primary-hover: #173A39;
-  --primary-active: #112C2B;
-  --primary-tint: #E3EDEB;
-  --accent: #B4643C;
-  --accent-tint: #F3E3D8;
-  --success: #3F7D5B;
-  --success-tint: #E1EEE6;
-  --warning: #B58A2B;
-  --warning-tint: #F4EAD0;
-  --error: #A8433A;
-  --error-tint: #F5DEDA;
-  --info: #3E6A8A;
-  --info-tint: #DEE9F1;
-  --focus: #2F7F7C;
+@theme {
+  --color-meridian-bg: var(--meridian-bg);
+  --color-meridian-surface: var(--meridian-surface);
+  --color-meridian-surface-elevated: var(--meridian-surface-elevated);
+  --color-meridian-surface-sunken: var(--meridian-surface-sunken);
+  --color-meridian-primary: var(--meridian-primary);
+  --color-meridian-primary-hover: var(--meridian-primary-hover);
+  --color-meridian-primary-active: var(--meridian-primary-active);
+  --color-meridian-primary-tint: var(--meridian-primary-tint);
+  --color-meridian-secondary: var(--meridian-secondary);
+  --color-meridian-accent: var(--meridian-accent);
+  --color-meridian-accent-tint: var(--meridian-accent-tint);
+  --color-meridian-text-primary: var(--meridian-text-primary);
+  --color-meridian-text-secondary: var(--meridian-text-secondary);
+  --color-meridian-text-muted: var(--meridian-text-muted);
+  --color-meridian-border: var(--meridian-border);
+  --color-meridian-border-strong: var(--meridian-border-strong);
+  --color-meridian-success: var(--meridian-success);
+  --color-meridian-success-tint: var(--meridian-success-tint);
+  --color-meridian-warning: var(--meridian-warning);
+  --color-meridian-warning-tint: var(--meridian-warning-tint);
+  --color-meridian-error: var(--meridian-error);
+  --color-meridian-error-tint: var(--meridian-error-tint);
+  --color-meridian-info: var(--meridian-info);
+  --color-meridian-info-tint: var(--meridian-info-tint);
 
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-6: 24px;
-  --space-8: 32px;
-  --space-12: 48px;
-  --space-16: 64px;
-  --space-24: 96px;
+  --font-serif: 'Fraunces', serif;
+  --font-sans: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-pill: 999px;
+  --radius-input: 6px;
+  --radius-chip: 6px;
+  --radius-card: 10px;
+  --radius-modal: 14px;
+  --radius-pill: 9999px;
 
-  --shadow-1: 0 1px 2px rgba(30,42,43,.06);
-  --shadow-2: 0 4px 16px rgba(30,42,43,.08);
-  --shadow-3: 0 16px 40px rgba(30,42,43,.14);
-
-  --t-fast: 150ms;
-  --t-med: 300ms;
-  --t-slow: 550ms;
-  --ease: cubic-bezier(.2,.7,.2,1);
-  --ease-in: cubic-bezier(.4,0,1,1);
-  --ease-wipe: cubic-bezier(.7,0,.2,1);
-
-  --z-sticky: 20;
-  --z-drawer: 40;
-  --z-modal: 50;
-  --z-toast: 60;
-  --z-loader: 100;
+  --shadow-sh-1: var(--sh-1);
+  --shadow-sh-2: var(--sh-2);
+  --shadow-sh-3: var(--sh-3);
 }
 
 body {
-  background-color: var(--bg);
-  color: var(--ink);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  line-height: 1.6;
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
+  background-color: var(--meridian-bg);
+  color: var(--meridian-text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3, .font-serif {
-  font-family: 'Fraunces', Georgia, serif;
+/* Custom utility styles */
+.font-display {
+  font-family: var(--font-serif);
+  font-variation-settings: 'opsz' 36;
 }
 
-code, pre, .font-mono {
-  font-family: 'JetBrains Mono', monospace;
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
 }
 
-/* Custom Scrollbar for flight recorder / investigation logs */
+/* Scrollbar styling */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -117,25 +98,9 @@ code, pre, .font-mono {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--border-strong);
-  border-radius: 4px;
+  background: var(--meridian-border-strong);
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--muted);
-}
-
-/* Reduced motion preference */
-@media (prefers-reduced-motion: reduce) {
-  *, ::before, ::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-
-/* Subtle focus ring */
-:focus-visible {
-  outline: 2px solid var(--focus);
-  outline-offset: 2px;
+  background: var(--meridian-text-muted);
 }
